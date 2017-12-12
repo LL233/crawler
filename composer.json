@@ -10,7 +10,8 @@
         }
     ],
     "require": {
-        "guzzle/guzzle": "^3.9"
+        "guzzle/guzzle": "^3.9",
+        "imangazaliev/didom": "^1.13"
     },
     "autoload": {
         "psr-4": {
