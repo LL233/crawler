@@ -2,7 +2,6 @@
 
 namespace Crawler\Components\MultiProcess;
 
-use Crawler\Components\SignalHandler\SignalHandler;
 use Exception;
 
 /**
@@ -12,53 +11,80 @@ use Exception;
  *
  * @author LL
  */
-class MainProcess
+class MainProcess extends BaseProcess
 {
     /**
-     * 信号监听处理
-     * @var SignalHandler
+     * 保存子进程的进程id
+     *
+     * @var array
      */
-    private $signalHndler;
+    private $subProcessPidMap = [];
+
+    /**
+     * 子进程的最大数量
+     *
+     * @var int
+     */
+    private $subProcessMaxCount;
+
+    /**
+     * 子进程的执行事件
+     *
+     * @var \Closure
+     */
+    private $subProcessHandle;
+
+    /**
+     * 进程休眠时间
+     *
+     * @var float
+     */
+    private $sleepTime = 0.1;
 
     /**
      * 主进程构造函数
      * 设置信号监听
      *
-     * @param SignalHandler $signalHandler
+     * @param \Closure      $handle         子进程的执行事件
      */
-    public function __construct(SignalHandler $signalHandler)
+    public function __construct(\Closure $handle)
     {
-        $this->signalHndler = $signalHandler;
+        $this->subProcessHandle = $handle;
 
-        declare(ticks = 1);
-
-        register_tick_function([$this, 'registerSignalHandler']);
+        $this->init();
     }
 
     /**
-     * 设置信号监听
+     * 进程的初始化
      *
      * @return void
      */
-    public function registerSignalHandler()
+    private function init()
     {
-        pcntl_signal(SIGTERM, [$this->signalHndler, 'sigHandle']);
-        pcntl_signal(SIGINT, [$this->signalHndler, 'sigHandle']);
-        pcntl_signal(SIGHUP, [$this->signalHndler, 'sigHandle']);
-        pcntl_signal(SIGQUIT, [$this->signalHndler, 'sigHandle']);
-        pcntl_signal(SIGUSR1, [$this->signalHndler, 'sigHandle']);
+        declare(ticks = 1);
+
+        //注册信号监听
+        $this->registerSignalHandler();
+        //设置守护进程
+        $this->daemonize();
+        //启动子进程
+        $this->startSubProcess();
+        //等待子进程
+        $this->wait();
     }
 
     /**
      * 使进程变为守护进程
      *
-     * @author LL
+     * @return void
+     *
+     * @throws Exception
      */
-    public function daemonize()
+    private function daemonize()
     {
         //只有在cli模式下可以变为守护进程
         if (php_sapi_name() != 'cli') {
-            return false;
+            return;
         }
 
         //文件掩码清0
@@ -88,5 +114,74 @@ class MainProcess
             //父进程退出
             exit(0);
         }
+    }
+
+    /**
+     * 启动子进程
+     *
+     * @return void
+     */
+    private function startSubProcess()
+    {
+        for ($i=0; $i<$this->subProcessMaxCount; $i++) {
+            $this->makeSubProcess();
+        }
+    }
+
+    /**
+     * 生成子进程
+     *
+     * @return void
+     *
+     * @throws Exception
+     */
+    private function makeSubProcess()
+    {
+        $pid = pcntl_fork();
+
+        if ($pid == 0) {
+            //子进程
+            $subProcess = new SubProcess();
+            $subProcess->handler($this->subProcessHandle);
+        } elseif ($pid > 0) {
+            //父进程
+            $this->subProcessPidMap[$pid] = $pid;
+        } else {
+            //错误
+            throw new Exception('fork fail in make sub process');
+        }
+    }
+
+    /**
+     * 父进程监听子进程
+     * 等待子进程退出
+     *
+     * @return void
+     */
+    private function wait()
+    {
+        while (true) {
+            $status = 0;
+
+            //等待子进程退出
+            $pid = pcntl_wait($status, WUNTRACED);
+
+            if ($pid > 0) {
+                unset($this->subProcessPidMap[$pid]);
+            }
+
+            sleep($this->sleepTime);
+        }
+    }
+
+    /**
+     * 信号处理
+     *
+     * @param  int $signal
+     * @return void
+     */
+    protected function signalHandler($signal)
+    {
+
     }
 }

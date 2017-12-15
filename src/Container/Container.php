@@ -98,10 +98,10 @@ class Container
 
         //如果这不是一个单例模式的实例，就把它加入实例组中
         if (!$this->aliases[$abstract]['isOnly']) {
-            $this->instances[$abstract] = $instances
+            $this->instances[$abstract] = $instance;
         }
 
-        return $instances;
+        return $instance;
     }
 
     /**
