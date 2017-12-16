@@ -37,9 +37,16 @@ class SubProcess extends BaseProcess
      */
     public function handler(\Closure $handle)
     {
-        call_user_func($handle);
+        while (true) {
+            call_user_func($handle);
 
-        sleep($this->sleepTime);
+            //停止进程
+            if ($this->stopStatus == 1) {
+                exit(0);
+            }
+
+            sleep($this->sleepTime);
+        }
     }
 
     /**
@@ -49,6 +56,7 @@ class SubProcess extends BaseProcess
      */
     private function init()
     {
+        $this->registerSignalHandler();
     }
 
     /**
