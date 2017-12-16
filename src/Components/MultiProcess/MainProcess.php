@@ -84,12 +84,12 @@ class MainProcess extends BaseProcess
     {
         declare(ticks = 1);
 
-        //启动子进程
-        $this->startSubProcess();
         //注册信号监听
         $this->registerSignalHandler();
         //设置守护进程
         $this->daemonize();
+        //启动子进程
+        $this->startSubProcess();
         //保存pid
         $this->savePid();
         //等待子进程
