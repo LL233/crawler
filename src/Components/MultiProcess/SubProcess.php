@@ -10,6 +10,20 @@ namespace Crawler\Components\MultiProcess;
  */
 class SubProcess extends BaseProcess
 {
+    /**
+     * 子进程每次执行完休眠时间
+     *
+     * @var float
+     */
+    private $sleepTime = 0.01;
+
+    /**
+     * 子进程的停止状态
+     *
+     * @var int
+     */
+    private $stopStatus = 0;
+
     public function __construct()
     {
         $this->init();
@@ -23,7 +37,9 @@ class SubProcess extends BaseProcess
      */
     public function handler(\Closure $handle)
     {
+        call_user_func($handle);
 
+        sleep($this->sleepTime);
     }
 
     /**
@@ -33,11 +49,22 @@ class SubProcess extends BaseProcess
      */
     private function init()
     {
-        $this->registerSignalHandler();
     }
 
+    /**
+     * 子进程的信号监听
+     *
+     * @param  int $signal
+     * @return void
+     */
     protected function signalHandler($signal)
     {
-
+        switch ($signal) {
+            //停止
+            case SIGTERM :
+            case SIGINT :
+                $this->stopStatus = 1;
+                break;
+        }
     }
 }

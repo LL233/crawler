@@ -25,10 +25,30 @@ abstract class BaseProcess
      */
     protected function registerSignalHandler()
     {
-        pcntl_signal(SIGTERM, [$this, "sigHandle"]);
-        pcntl_signal(SIGINT, [$this, "sigHandle"]);
-        pcntl_signal(SIGHUP, [$this, "sigHandle"]);
-        pcntl_signal(SIGQUIT, [$this, "sigHandle"]);
-        pcntl_signal(SIGUSR1, [$this, "sigHandle"]);
+        pcntl_signal(SIGTERM, [$this, "signalHandler"]);
+        pcntl_signal(SIGINT, [$this, "signalHandler"]);
+        pcntl_signal(SIGUSR1, [$this, "signalHandler"]);
+    }
+
+    /**
+     * 获取保存pid文件的路径
+     *
+     * @return string
+     */
+    protected function getSavePidPath()
+    {
+        return '/var/run/crawler.pid';
+    }
+
+    /**
+     * 保存pid
+     *
+     * @return void
+     */
+    protected function savePid()
+    {
+        $pid = posix_getpid();
+
+        file_put_contents($pid, $this->getSavePidPath());
     }
 }

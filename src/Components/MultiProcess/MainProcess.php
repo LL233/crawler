@@ -42,10 +42,31 @@ class MainProcess extends BaseProcess
     private $sleepTime = 0.1;
 
     /**
+     * 进程是否处于停止状态
+     *
+     * @var int
+     */
+    private $stopStatus = 0;
+
+    /**
+     * 进程是否处于重启状态
+     *
+     * @var int
+     */
+    private $restartStatus = 0;
+
+    /**
+     * 已经完成重启的子进程的数量
+     *
+     * @var int
+     */
+    private $restartSubProcessCount = 0;
+
+    /**
      * 主进程构造函数
      * 设置信号监听
      *
-     * @param \Closure      $handle         子进程的执行事件
+     * @param \Closure $handle 子进程的执行事件
      */
     public function __construct(\Closure $handle)
     {
@@ -63,12 +84,14 @@ class MainProcess extends BaseProcess
     {
         declare(ticks = 1);
 
+        //启动子进程
+        $this->startSubProcess();
         //注册信号监听
         $this->registerSignalHandler();
         //设置守护进程
         $this->daemonize();
-        //启动子进程
-        $this->startSubProcess();
+        //保存pid
+        $this->savePid();
         //等待子进程
         $this->wait();
     }
@@ -167,7 +190,18 @@ class MainProcess extends BaseProcess
             $pid = pcntl_wait($status, WUNTRACED);
 
             if ($pid > 0) {
-                unset($this->subProcessPidMap[$pid]);
+                //如果进程处于停止状态
+                if ($this->stopStatus != 0) {
+                    $this->stopHandler($pid);
+                }
+                //如果进程处于重启状态
+                if ($this->restartStatus != 0) {
+                    $this->restartHandler($pid);
+                }
+                //如果进程是异常退出
+                if ($this->stopStatus == 0 && $this->restartStatus == 0) {
+                    $this->exceptionProcessHandler($pid, $status);
+                }
             }
 
             sleep($this->sleepTime);
@@ -182,6 +216,114 @@ class MainProcess extends BaseProcess
      */
     protected function signalHandler($signal)
     {
+        switch ($signal) {
+            //退出
+            case SIGINT :
+            case SIGTERM :
+                $this->stop();
+                break;
+            //重启
+            case SIGUSR1:
+                $this->restart();
+                break;
+        }
+    }
 
+    /**
+     * 进程退出
+     * 等待并回收全部子进程后退出
+     *
+     * @return void
+     */
+    private function stop()
+    {
+        $this->stopStatus = 1;
+
+        $this->killSubProcess();
+    }
+
+    /**
+     * 重启子进程
+     *
+     * @return void
+     */
+    private function restart()
+    {
+        $this->restartStatus = 1;
+
+        $this->killSubProcess();
+    }
+
+    /**
+     * 结束子进程
+     *
+     * @return void
+     */
+    private function killSubProcess()
+    {
+        foreach ($this->subProcessPidMap as $pid) {
+            //向所有子进程发送退出信号
+            posix_kill($pid, SIGTERM);
+        }
+    }
+
+    /**
+     * 进程停止的操作
+     *
+     * @param  int $pid
+     * @return void
+     */
+    private function stopHandler($pid)
+    {
+        if (isset($this->subProcessPidMap[$pid])) {
+            unset($this->subProcessPidMap[$pid]);
+        }
+
+        if (count($this->subProcessPidMap) == 0) {
+            exit(0);
+        }
+    }
+
+    /**
+     * 重启进程的操作
+     *
+     * @param  int $pid
+     * @return void
+     */
+    private function restartHandler($pid)
+    {
+        if (isset($this->subProcessPidMap[$pid])) {
+            try {
+                $this->makeSubProcess();
+                unset($this->subProcessPidMap[$pid]);
+                $this->restartSubProcessCount++;
+            } catch (Exception $e) {
+                //TODO:记录日志
+            }
+        }
+
+        //如果重启子进程的数量已经达到子进程最大的数量，则停止重启状态
+        if ($this->restartSubProcessCount == $this->subProcessMaxCount) {
+            $this->restartStatus = 0;
+            $this->restartSubProcessCount = 0;
+        }
+    }
+
+    /**
+     * 异常退出的子进程
+     *
+     * @param  int $pid    子进程的id
+     * @param  int $status 子进程的退出状态
+     * @return void
+     */
+    private function exceptionProcessHandler($pid, $status)
+    {
+        if (isset($this->subProcessPidMap[$pid])) {
+            //重启一个子进程
+            unset($this->subProcessPidMap[$pid]);
+            $this->makeSubProcess();
+
+            //TODO:记录子进程的退出状态
+        }
     }
 }
