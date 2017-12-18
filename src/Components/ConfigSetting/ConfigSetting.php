@@ -57,7 +57,7 @@ class ConfigSetting implements ArrayAccess
      */
     public function offsetGet($offset)
     {
-        return isset($this->config[$offset]) ? $this->config : null;
+        return isset($this->config[$offset]) ? $this->config[$offset] : null;
     }
 
     /**
