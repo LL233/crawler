@@ -49,6 +49,6 @@ abstract class BaseProcess
     {
         $pid = posix_getpid();
 
-        file_put_contents($pid, $this->getSavePidPath());
+        file_put_contents($this->getSavePidPath(), $pid);
     }
 }
