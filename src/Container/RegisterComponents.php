@@ -67,6 +67,10 @@ class RegisterComponents
             return new \Crawler\Components\Queue\MemoryQueue();
         });
 
+        $this->container->bind('MultiProcess', function($app, $params){
+            return new \Crawler\Components\MultiProcess\MainProcess($params['handler']);
+        });
+
         $this->container->bind('Spider', function($app){
 
         });
