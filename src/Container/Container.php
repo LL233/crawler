@@ -20,7 +20,7 @@ class Container
      *
      * @var static
      */ 
-    public static $instance;
+    private static $instance;
 
     /**
      * 注册到容器的别名
@@ -63,7 +63,7 @@ class Container
     public function bind($abstract, Closure $concrete, $isOnly = true)
     {   
         //如果已经绑定，则抛出异常
-        if (isset($this->aliases[$abstract])) {
+        if (isset($this->instances[$abstract])) {
             throw new Exception("this {$abstract} already registered");
         }
 
