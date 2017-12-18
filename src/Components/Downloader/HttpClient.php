@@ -15,16 +15,16 @@ class HttpClient implements DownloaderInterface
     /**
      * guzzle提供的客户端
      *
-     * @var \Guzzle\Http\Client
+     * @var \GuzzleHttp\Client
      */
     private $guzzleHttpClient;
 
     /**
      * 构造函数
      *
-     * @param \Guzzle\Http\Client $client
+     * @param \GuzzleHttp\Client $client
      */
-    public function __construct(\Guzzle\Http\Client $client)
+    public function __construct(\GuzzleHttp\Client $client)
     {
         $this->guzzleHttpClient = $client;
     }
