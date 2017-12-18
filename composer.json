@@ -10,12 +10,21 @@
         }
     ],
     "require": {
-        "guzzle/guzzle": "^3.9",
-        "imangazaliev/didom": "^1.13"
+		"php": ">=7.2",
+        "imangazaliev/didom": "^1.13",
+        "guzzlehttp/guzzle": "^6.3"
     },
+	"require-dev": {
+		"phpunit/phpunit": "^6.5"
+	},
     "autoload": {
         "psr-4": {
             "Crawler\\": "src/"
         }
-    }
+    },
+	"autoload-dev": {
+		"psr-4": {
+			"Tests\\": "tests/"
+		}
+	}
 }

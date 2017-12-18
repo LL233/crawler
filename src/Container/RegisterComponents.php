@@ -42,7 +42,9 @@ class RegisterComponents
 
         //\Guzzle\Http\Client
         $this->container->bind('Client', function($app){
-            return new \Guzzle\Http\Client();
+            return new \GuzzleHttp\Client([
+                'timeout' => 2.0
+            ]);
         });
 
         $this->container->bind('Downloader', function($app){
