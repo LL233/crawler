@@ -2,6 +2,10 @@
 
 namespace Crawler\Components\Spider;
 
+use Crawler\Components\Parser\ParserInterface;
+use Crawler\Components\Downloader\DownloaderInterface;
+use Crawler\Components\Queue\QueueInterface;
+
 /**
  * MultiSpider抓取引擎
  *
@@ -9,6 +13,26 @@ namespace Crawler\Components\Spider;
  */
 class MultiSpider implements SpiderInterface
 {
+    /**
+     * 下载器
+     *
+     * @var DownloaderInterface
+     */
+    private $downloader;
+
+    /**
+     * 队列
+     *
+     * @var QueueInterface
+     */
+    private $queue;
+
+    public function __construct(DownloaderInterface $downloader, QueueInterface $queue)
+    {
+        $this->downloader = $downloader;
+        $this->queue = $queue;
+    }
+
     /**
      * 获取抓取内容
      *

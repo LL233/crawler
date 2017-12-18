@@ -44,5 +44,29 @@ class RegisterComponents
         $this->container->bind('Client', function($app){
             return new \Guzzle\Http\Client();
         });
+
+        $this->container->bind('Downloader', function($app){
+            return new \Crawler\Components\Downloader\HttpClient($app->make('Client'));
+        });
+
+        $this->container->bind('HtmlParser', function($app){
+            return new \Crawler\Components\Parser\HtmlParser($app->make('Document'));
+        });
+
+        $this->container->bind('JsonParser', function($app){
+            return new \Crawler\Components\Parser\JsonParser();
+        });
+
+        $this->container->bind('RegexParser', function($app){
+            return new \Crawler\Components\Parser\RegexParser();
+        });
+
+        $this->container->bind('Queue', function($app){
+            return new \Crawler\Components\Queue\MemoryQueue();
+        });
+
+        $this->container->bind('Spider', function($app){
+
+        });
     }
 }
