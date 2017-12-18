@@ -3,11 +3,11 @@
 namespace Crawler\Components\Spider;
 
 /**
- * BlackWidow抓取引擎
+ * MultiSpider抓取引擎
  *
  * @author LL
  */
-class BlackWidow implements SpiderInterface
+class MultiSpider implements SpiderInterface
 {
     /**
      * 获取抓取内容
