@@ -39,7 +39,7 @@ class MainProcess extends BaseProcess
      *
      * @var float
      */
-    private $sleepTime = 0.1;
+    private $sleepTime = 0.5;
 
     /**
      * 进程是否处于停止状态
@@ -88,10 +88,10 @@ class MainProcess extends BaseProcess
         $this->registerSignalHandler();
         //设置守护进程
         $this->daemonize();
-        //启动子进程
-        $this->startSubProcess();
         //保存pid
         $this->savePid();
+        //启动子进程
+        $this->startSubProcess();
         //等待子进程
         $this->wait();
     }
