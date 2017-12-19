@@ -40,6 +40,8 @@ class SubProcess extends BaseProcess
         while (true) {
             call_user_func($handle);
 
+            pcntl_signal_dispatch();
+
             //停止进程
             if ($this->stopStatus == 1) {
                 exit(0);

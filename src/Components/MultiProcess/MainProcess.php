@@ -91,8 +91,6 @@ class MainProcess extends BaseProcess
      */
     private function init()
     {
-        declare(ticks = 1);
-
         //注册信号监听
         $this->registerSignalHandler();
         //设置守护进程
@@ -197,8 +195,10 @@ class MainProcess extends BaseProcess
         while (true) {
             $status = 0;
 
+            pcntl_signal_dispatch();
+
             //等待子进程退出
-            $pid = pcntl_wait($status, WUNTRACED);
+            $pid = pcntl_wait($status, WNOHANG);
 
             if ($pid > 0) {
                 //如果进程处于停止状态
@@ -345,7 +345,13 @@ class MainProcess extends BaseProcess
      */
     private function resetStdout()
     {
+        global $STDOUT, $STDERR;
+
+        //关闭标准输出和标准错误输出
         @fclose(STDOUT);
         @fclose(STDERR);
+
+        $STDOUT = fopen('/data/dev/test.log', 'a');
+        $STDERR = fopen('/data/dev/test.log', 'a');
     }
 }

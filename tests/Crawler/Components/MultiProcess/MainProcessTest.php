@@ -10,7 +10,7 @@ class MainProcessTest extends TestCase
     {
         $process = $this->app->make('MultiProcess', [
             'handler' => function() {
-                echo posix_getpid();
+                return 'hello world';
             },
             'subProcessCount' => 2
         ]);
