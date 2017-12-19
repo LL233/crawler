@@ -15,7 +15,7 @@ class SubProcess extends BaseProcess
      *
      * @var float
      */
-    private $sleepTime = 0.01;
+    private $sleepTime = 1;
 
     /**
      * 子进程的停止状态

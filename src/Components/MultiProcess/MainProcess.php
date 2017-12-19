@@ -39,7 +39,7 @@ class MainProcess extends BaseProcess
      *
      * @var float
      */
-    private $sleepTime = 0.5;
+    private $sleepTime = 1;
 
     /**
      * 进程是否处于停止状态
@@ -63,14 +63,23 @@ class MainProcess extends BaseProcess
     private $restartSubProcessCount = 0;
 
     /**
+     * 标准输出重定向位置
+     *
+     * @var string
+     */
+    private $stdoutFilePath = '/dev/null';
+
+    /**
      * 主进程构造函数
      * 设置信号监听
      *
-     * @param \Closure $handle 子进程的执行事件
+     * @param \Closure $handle          子进程的执行事件
+     * @param int      $subProcessCount 子进程的启动数量
      */
-    public function __construct(\Closure $handle)
+    public function __construct(\Closure $handle, int $subProcessCount = 0)
     {
         $this->subProcessHandle = $handle;
+        $this->subProcessMaxCount = $subProcessCount;
 
         $this->init();
     }
@@ -88,6 +97,8 @@ class MainProcess extends BaseProcess
         $this->registerSignalHandler();
         //设置守护进程
         $this->daemonize();
+        //重定向标准输出
+        $this->resetStdout();
         //保存pid
         $this->savePid();
         //启动子进程
@@ -325,5 +336,16 @@ class MainProcess extends BaseProcess
 
             //TODO:记录子进程的退出状态
         }
+    }
+
+    /**
+     * 重定向标准输出和标准错误输出
+     *
+     * @return void
+     */
+    private function resetStdout()
+    {
+        @fclose(STDOUT);
+        @fclose(STDERR);
     }
 }

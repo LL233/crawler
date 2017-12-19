@@ -68,7 +68,7 @@ class RegisterComponents
         });
 
         $this->container->bind('MultiProcess', function($app, $params){
-            return new \Crawler\Components\MultiProcess\MainProcess($params['handler']);
+            return new \Crawler\Components\MultiProcess\MainProcess($params['handler'], $params['subProcessCount']);
         });
 
         $this->container->bind('Spider', function($app){

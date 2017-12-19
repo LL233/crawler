@@ -12,6 +12,7 @@
     <testsuites>
         <testsuite name="Crawler Test">
             <directory>./tests/Crawler</directory>
+            <exclude>tests/Crawler/Components/MultiProcess/MainProcessTest.php</exclude>
         </testsuite>
     </testsuites>
 </phpunit>
