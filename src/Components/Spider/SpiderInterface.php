@@ -12,16 +12,18 @@ interface SpiderInterface
     /**
      * 获取抓取内容
      *
+     * @param  mixed $link
      * @return mixed
      */
-    public function getContent();
+    public function getContent($link);
 
     /**
      * 清洗数据
      *
+     * @param  mixed $data
      * @return mixed
      */
-    public function filterData();
+    public function filterData($data);
 
     /**
      * 准备下一次的抓取
