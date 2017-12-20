@@ -60,7 +60,7 @@ class Container
      *
      * @throws Exception
      */
-    public function bind($abstract, Closure $concrete, $isOnly = true)
+    public function bind($abstract, Closure $concrete, $isOnly = false)
     {   
         //如果已经绑定，则抛出异常
         if (isset($this->instances[$abstract])) {
