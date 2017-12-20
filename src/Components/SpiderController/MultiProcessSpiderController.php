@@ -2,7 +2,7 @@
 
 namespace Crawler\Components\SpiderController;
 
-use Crawler\Components\SpiderController\SpiderControllerInterface;
+use Crawler\Components\Spider\MultiSpider;
 
 /**
  * 基于多进程实现的爬虫控制器
@@ -11,8 +11,11 @@ use Crawler\Components\SpiderController\SpiderControllerInterface;
  */
 class MultiProcessSpiderController implements SpiderControllerInterface
 {
-    public function __construct()
+    private $spider;
+
+    public function __construct(MultiSpider $spider)
     {
+        $this->spider = $spider;
     }
 
     /**
@@ -20,9 +23,14 @@ class MultiProcessSpiderController implements SpiderControllerInterface
      *
      * @return void
      */
-    public function start()
+    public function start(): void
     {
+        while (($link = $this->spider->next())) {
+            $response = $this->spider->getContent($link);
+            $this->spider->filterData($response);
+        }
 
+        $this->stop();
     }
 
     /**
@@ -30,8 +38,8 @@ class MultiProcessSpiderController implements SpiderControllerInterface
      *
      * @return void
      */
-    public function stop()
+    public function stop(): void
     {
-
+        $this->spider->end();
     }
 }

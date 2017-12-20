@@ -18,12 +18,12 @@ interface SpiderControllerInterface
      *
      * @return void
      */
-    public function start();
+    public function start(): void;
 
     /**
      * 停止爬虫
      *
      * @return void
      */
-    public function stop();
+    public function stop(): void;
 }
