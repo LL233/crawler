@@ -74,5 +74,13 @@ class RegisterComponents
         $this->container->bind('Spider', function($app){
 
         });
+
+        $this->container->bind('Event', function($app){
+            return new \Symfony\Component\EventDispatcher\EventDispatcher();
+        });
+
+        $this->container->bind('SpiderEvent', function($app, $params){
+            return new \Crawler\EventListener\Events\SpiderEvent($params['spider'], $params['params']);
+        }, true);
     }
 }
