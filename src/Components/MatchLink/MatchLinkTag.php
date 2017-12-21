@@ -58,4 +58,14 @@ class MatchLinkTag implements MatchLinkInterface
 
         return $this->defaultTag;
     }
+
+    /**
+     * 获取默认的tag名称
+     *
+     * @return string
+     */
+    public function getDefaultTag(): string
+    {
+        return $this->defaultTag;
+    }
 }
