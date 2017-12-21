@@ -50,7 +50,7 @@ class MultiSpider implements SpiderInterface
      *
      * @var EventDispatcher
      */
-    private $event;
+    private $eventDispatcher;
 
     /**
      * 容器实例
@@ -60,18 +60,18 @@ class MultiSpider implements SpiderInterface
     private $container;
 
     /**
-     * 当前正在处理的链接
-     *
-     * @var string
-     */
-    private $currentLink = '';
-
-    /**
      * 当前链接对应标识
      *
      * @var mixed
      */
     private $tag;
+
+    /**
+     * 当前正在处理的链接
+     *
+     * @var string
+     */
+    public $currentLink = '';
 
     public function __construct(
         DownloaderInterface $downloader,
@@ -85,7 +85,7 @@ class MultiSpider implements SpiderInterface
         $this->queue = $queue;
         $this->filter = $filter;
         $this->matchLink = $matchLink;
-        $this->event = $event;
+        $this->eventDispatcher = $event;
         $this->container = $container;
     }
 
@@ -151,7 +151,20 @@ class MultiSpider implements SpiderInterface
      */
     public function end(): void
     {
+        //爬虫停止事件
+        $this->dispatch(EventTag::SPIDER_STOP);
+
         exit(0);
+    }
+
+    /**
+     * 获取当前链接所对应的tag
+     *
+     * @return string
+     */
+    public function getTag(): string
+    {
+        return $this->tag;
     }
 
     /**
@@ -163,14 +176,14 @@ class MultiSpider implements SpiderInterface
     }
 
     /**
-     * 触发事件
+     * 事件派发
      *
      * @param string $eventTag 事件名称
      * @param array  $params   事件参数
      */
-    private function dispatch(string $eventTag, array $params): void
+    private function dispatch(string $eventTag, array $params = []): void
     {
-        $this->event->dispatch($eventTag, $this->container->make('SpiderEvent', [
+        $this->eventDispatcher->dispatch($eventTag, $this->container->make('SpiderEvent', [
             "spider" => $this,
             "params" => $params
         ]));
