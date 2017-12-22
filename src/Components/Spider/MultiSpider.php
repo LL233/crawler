@@ -97,10 +97,8 @@ class MultiSpider implements SpiderInterface
      */
     public function getContent($link)
     {
-        $this->currentLink = $link;
-
-        //设置tag
-        $this->setTag();
+        //设置当前链接
+        $this->setCurrentLink($link);
 
         $response = $this->downloader->download($link);
 
@@ -170,9 +168,12 @@ class MultiSpider implements SpiderInterface
 
     /**
      * 获取当前链接所对应的tag
+     *
+     * @param string $link
      */
-    private function setTag(): void
+    private function setCurrentLink(string $link): void
     {
+        $this->currentLink = $link;
         $this->tag = $this->matchLink->match($this->currentLink);
     }
 
