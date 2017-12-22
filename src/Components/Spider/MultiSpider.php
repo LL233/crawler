@@ -92,13 +92,17 @@ class MultiSpider implements SpiderInterface
     /**
      * 获取抓取内容
      *
-     * @param  array $link 包含['path' => '', 'method' => '']
+     * @param  string $link
      * @return mixed
      */
     public function getContent($link)
     {
-        $this->currentLink = $link['path'];
-        $response = $this->downloader->download($link['path'], $link['method']);
+        $this->currentLink = $link;
+
+        //设置tag
+        $this->setTag();
+
+        $response = $this->downloader->download($link);
 
         $this->dispatch(EventTag::SPIDER_NEXT_LINK_AFTER, ["response" => $response]);
 
@@ -113,9 +117,6 @@ class MultiSpider implements SpiderInterface
      */
     public function filterData($data): void
     {
-        //设置tag
-        $this->setTag();
-
         //过滤链接和数据
         $linkRes = $this->filter->filterLink($this->tag, $data);
         $dataRes = $this->filter->filterData($this->tag, $data);
