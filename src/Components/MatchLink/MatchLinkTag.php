@@ -34,7 +34,7 @@ class MatchLinkTag implements MatchLinkInterface
      * 设置链接匹配规则
      *
      * @param string $tag
-     * @param string  $rule
+     * @param string $rule
      */
     public function setRule(string $tag, $rule): void
     {
