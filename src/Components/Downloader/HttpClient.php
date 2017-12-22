@@ -2,7 +2,7 @@
 
 namespace Crawler\Components\Downloader;
 
-use Crawler\Components\Downloader\DownloaderInterface;
+use Crawler\Container\Container;
 
 /**
  * 通过http实现下载器
@@ -20,6 +20,13 @@ class HttpClient implements DownloaderInterface
     private $guzzleHttpClient;
 
     /**
+     * 保存请求配置的数组
+     *
+     * @var array
+     */
+    private $requestConfig = [];
+
+    /**
      * 构造函数
      *
      * @param \GuzzleHttp\Client $client
@@ -33,12 +40,41 @@ class HttpClient implements DownloaderInterface
      * 对一个连接发起请求，并获得连接的内容
      *
      * @param  string $link   请求连接
-     * @param  string $method 请求方法
-     * @param  string $params 请求的其余参数
      * @return mixed 请求后获得的内容
      */
-    public function download($link, $method, $params = [])
+    public function download($link)
     {
-        return $this->guzzleHttpClient->request($method, $link);
+        $tag = Container::getInstance()->make('Spider');
+
+        list($method, $params) = $this->getRequestConfig($tag);
+
+        return $this->guzzleHttpClient->request($method, $link, $params);
+    }
+
+    /**
+     * 根据tag获取请求配置
+     *
+     * @param  string $tag
+     * @return array [method => '', params => []]
+     */
+    private function getRequestConfig($tag)
+    {
+        $config = $this->requestConfig[$tag] ?? [];
+
+        $config['method'] = $config['method'] ?? 'GET';
+        $config['params'] = $config['params'] ?? [];
+
+        return $config;
+    }
+
+    /**
+     * 设置请求配置
+     *
+     * @param string $tag
+     * @param array  $config
+     */
+    public function setRequestConfig(string $tag, array $config): void
+    {
+        $this->requestConfig[$tag] = $config;
     }
 }
