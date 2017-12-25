@@ -82,5 +82,9 @@ class RegisterComponents
         $this->container->bind('SpiderEvent', function($app, $params){
             return new \Crawler\EventListener\Events\SpiderEvent($params['spider'], $params['params']);
         }, true);
+
+        $this->container->bind('FileCookie', function($app){
+            return new \GuzzleHttp\Cookie\FileCookieJar(__DIR__.'/cookie');
+        });
     }
 }
