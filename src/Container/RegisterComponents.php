@@ -48,7 +48,7 @@ class RegisterComponents
         });
 
         $this->container->bind('Downloader', function($app){
-            return new \Crawler\Components\Downloader\HttpClient($app->make('Client'));
+            return new \Crawler\Components\Downloader\HttpClient($app->make('Client'), $app->make('Event'));
         });
 
         $this->container->bind('HtmlParser', function($app){
@@ -72,7 +72,14 @@ class RegisterComponents
         });
 
         $this->container->bind('Spider', function($app){
-
+            return new \Crawler\Components\Spider\MultiSpider(
+                $app->make('Downloader'),
+                $app->make('Queue'),
+                $app->make('Filter'),
+                $app->make('MatchLink'),
+                $app->make('Event'),
+                $app
+            );
         });
 
         $this->container->bind('Event', function($app){
@@ -85,6 +92,22 @@ class RegisterComponents
 
         $this->container->bind('FileCookie', function($app){
             return new \GuzzleHttp\Cookie\FileCookieJar(__DIR__.'/cookie');
+        });
+
+        $this->container->bind('RequestEvent', function($app, $params){
+            return new \Crawler\EventListener\Events\RequestEvent($params['downloader']);
+        }, true);
+
+        $this->container->bind('HttpClientBaseEvent', function($app){
+            return new \Crawler\Components\Downloader\HttpClientBaseEvent($app->make('Spider'), $app->make('Config'));
+        });
+
+        $this->container->bind('MatchLink', function($app){
+            return new \Crawler\Components\MatchLink\MatchLinkTag();
+        });
+
+        $this->container->bind('Filter', function($app){
+            return new \Crawler\Components\Filter\SimpleFilter('default');
         });
     }
 }
