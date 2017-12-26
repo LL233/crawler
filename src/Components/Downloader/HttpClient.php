@@ -3,6 +3,8 @@
 namespace Crawler\Components\Downloader;
 
 use Crawler\Container\Container;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Crawler\EventListener\EventTag;
 
 /**
  * 通过http实现下载器
@@ -13,6 +15,27 @@ use Crawler\Container\Container;
 class HttpClient implements DownloaderInterface
 {
     /**
+     * 请求时的参数
+     *
+     * @var array
+     */
+    public $requestParams = [];
+
+    /**
+     * 请求时的方法
+     *
+     * @var string
+     */
+    public $requestMethod = 'GET';
+
+    /**
+     * 请求的链接
+     *
+     * @var string
+     */
+    public $requestLink = '';
+
+    /**
      * guzzle提供的客户端
      *
      * @var \GuzzleHttp\Client
@@ -20,92 +43,65 @@ class HttpClient implements DownloaderInterface
     private $guzzleHttpClient;
 
     /**
-     * 保存请求配置的数组
+     * 事件派发
      *
-     * @var array
+     * @var EventDispatcher
      */
-    private $requestConfig = [];
-
-    /**
-     * 请求时的参数
-     *
-     * @var array
-     */
-    private $requestParams = [];
-
-    /**
-     * 请求时的方法
-     *
-     * @var string
-     */
-    private $requestMethod = 'GET';
+    private $eventDispatcher;
 
     /**
      * 构造函数
      *
      * @param \GuzzleHttp\Client $client
+     * @param EventDispatcher    $eventDispatcher
      */
-    public function __construct(\GuzzleHttp\Client $client)
+    public function __construct(\GuzzleHttp\Client $client, EventDispatcher $eventDispatcher)
     {
         $this->guzzleHttpClient = $client;
+        $this->eventDispatcher = $eventDispatcher;
+
+        $this->registerBaseEvent();
     }
 
     /**
      * 对一个连接发起请求，并获得连接的内容
      *
      * @param  string $link   请求连接
+     * @param  string $method 请求方法
+     * @param  array  $params 请求参数
      * @return mixed 请求后获得的内容
      */
-    public function download($link)
+    public function download(string $link, string $method = 'GET', array $params = [])
     {
-        $tag = Container::getInstance()->make('Spider')->getTag();
+        $this->requestParams = $params;
+        $this->requestMethod = $method;
+        $this->requestLink = $link;
 
-        $this->getRequestConfig($tag);
+        //触发请求前的事件
+        $this->eventDispatcher->dispatch(EventTag::REQUEST_BEFORE, Container::getInstance()->make('RequestEvent', ['downloader' => $this]));
 
-        return $this->guzzleHttpClient->request($this->requestMethod, $link, $this->requestParams);
+        $response = $this->guzzleHttpClient->request($this->requestMethod, $this->requestLink, $this->requestParams);
+
+        $this->clear();
+
+        return (string)$response->getBody();
     }
 
     /**
-     * 根据tag获取请求配置
-     *
-     * @param  string $tag
+     * 注册请求前会触发的事件
      */
-    private function getRequestConfig(string $tag): void
+    private function registerBaseEvent(): void
     {
-        $config = $this->requestConfig[$tag] ?? [];
-
-        $this->requestMethod = $config['method'] ?? 'GET';
-        $this->requestParams = $config['params'] ?? [];
+        $this->eventDispatcher->addListener(EventTag::REQUEST_BEFORE, [Container::getInstance()->make('HttpClientBaseEvent'), 'baseEvent'], 0);
     }
 
     /**
-     * 设置请求配置
-     *
-     * @param string $tag
-     * @param array  $config
+     * 清除
      */
-    public function setRequestConfig(string $tag, array $config): void
+    private function clear(): void
     {
-        $this->requestConfig[$tag] = $config;
-    }
-
-    /**
-     * 设置cookie
-     */
-    private function setCookie(): void
-    {
-        if (!isset($this->requestParams['cookies'])) {
-            $this->requestParams['cookies'] = Container::getInstance()->make('FileCookie');
-        }
-    }
-
-    /**
-     * 伪造成客户端
-     */
-    private function forgeClient(): void
-    {
-        if (!isset($this->requestParams['headers']['User-Agent'])) {
-            $this->requestParams['headers']['User-Agent'] = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11';
-        }
+        $this->requestParams = [];
+        $this->requestMethod = '';
+        $this->requestLink = '';
     }
 }
