@@ -90,7 +90,7 @@ class RegisterComponents
             return new \Crawler\EventListener\Events\SpiderEvent($params['spider'], $params['params']);
         }, true);
 
-        $this->container->bind('FileCookie', function($app){
+        $this->container->bind('Cookie', function($app){
             return new \GuzzleHttp\Cookie\FileCookieJar(__DIR__.'/cookie');
         });
 

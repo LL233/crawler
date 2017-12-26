@@ -87,7 +87,7 @@ class HttpClientBaseEvent
     {
         //如果没有配置cookie
         if (!isset($this->client->requestParams['cookies'])) {
-            $this->client->requestParams['cookies'] = Container::getInstance()->make('FileCookie');
+            $this->client->requestParams['cookies'] = Container::getInstance()->make('Cookie');
         }
     }
 
