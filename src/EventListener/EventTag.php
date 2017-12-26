@@ -17,4 +17,7 @@ final class EventTag
     const SPIDER_FILTER_CONTENT_AFTER = 'spider.filterContent.after';
     //爬虫获取下一个链接后
     const SPIDER_NEXT_LINK_AFTER = 'spider.nextLink.after';
+
+    //发起请求前的事件
+    const REQUEST_BEFORE = 'downloader.request.before';
 }
