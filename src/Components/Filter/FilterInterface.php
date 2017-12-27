@@ -3,6 +3,7 @@
 namespace Crawler\Components\Filter;
 
 use Closure;
+use Crawler\Components\Parser\ParserInterface;
 
 /**
  * 过滤器接口
@@ -17,34 +18,34 @@ interface FilterInterface
     /**
      * 设置链接过滤规则
      *
-     * @param string  $tag
-     * @param Closure $rule
+     * @param string  $tag  链接标识
+     * @param Closure $rule 一个闭包函数，参数为解析器实例
      */
     public function setFilterLinkRule(string $tag, Closure $rule): void;
 
     /**
      * 设置数据过滤规则
      *
-     * @param string  $tag
-     * @param Closure $rule
+     * @param string  $tag  链接标识
+     * @param Closure $rule 一个闭包函数，参数为解析器实例
      */
     public function setFilterDataRule(string $tag, Closure $rule): void;
 
     /**
      * 过滤出链接数据，用于后面的爬取
      *
-     * @param  string $tag
-     * @param  mixed  $data
+     * @param  string          $tag    当前链接的标识
+     * @param  ParserInterface $parser 解析器实例
      * @return mixed
      */
-    public function filterLink(string $tag, $data);
+    public function filterLink(string $tag, ParserInterface $parser);
 
     /**
-     * 过滤出业务所需数组，提供给用户使用
+     * 过滤出业务所需数据，提供给用户使用
      *
-     * @param  string $tag
-     * @param  mixed  $data
+     * @param  string          $tag    当前链接的标识
+     * @param  ParserInterface $parser 解析器实例
      * @return mixed
      */
-    public function filterData(string $tag, $data);
+    public function filterData(string $tag, ParserInterface $parser);
 }

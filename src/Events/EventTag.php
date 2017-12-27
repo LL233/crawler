@@ -1,6 +1,6 @@
 <?php
 
-namespace Crawler\EventListener;
+namespace Crawler\Events;
 
 /**
  * 事件名称

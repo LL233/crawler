@@ -7,8 +7,10 @@ use Crawler\Components\Downloader\DownloaderInterface;
 use Crawler\Components\Queue\QueueInterface;
 use Crawler\Components\MatchLink\MatchLinkInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Crawler\EventListener\EventTag;
+use Crawler\Events\EventTag;
 use Crawler\Container\Container;
+use Crawler\Components\Parser\ParserInterface;
+use Exception;
 
 /**
  * MultiSpider抓取引擎
@@ -93,31 +95,37 @@ class MultiSpider implements SpiderInterface
      * 获取抓取内容
      *
      * @param  string $link
-     * @return mixed
+     * @return ParserInterface
+     *
+     * @throws Exception
      */
-    public function getContent($link)
+    public function getContent($link): ParserInterface
     {
         //设置当前链接
         $this->setCurrentLink($link);
 
-        $response = $this->downloader->download($link);
+        $parser = $this->downloader->download($link);
 
-        $this->dispatch(EventTag::SPIDER_NEXT_LINK_AFTER, ["response" => $response]);
+        if (!$parser) {
+            $this->dispatch(EventTag::SPIDER_GET_CONTENT_AFTER, ["parser" => $parser]);
 
-        return $response;
+            return $parser;
+        } else {
+            throw new Exception('not has data');
+        }
     }
 
     /**
      * 清洗数据
      *
-     * @param  mixed $data
+     * @param  ParserInterface $parser
      * @return void
      */
-    public function filterData($data): void
+    public function filterData(ParserInterface $parser): void
     {
         //过滤链接和数据
-        $linkRes = $this->filter->filterLink($this->tag, $data);
-        $dataRes = $this->filter->filterData($this->tag, $data);
+        $linkRes = $this->filter->filterLink($this->tag, $parser);
+        $dataRes = $this->filter->filterData($this->tag, $parser);
 
         $this->dispatch(EventTag::SPIDER_FILTER_CONTENT_AFTER, [
             "linkRes" => $linkRes,

@@ -4,6 +4,7 @@ namespace Crawler\Components\Filter;
 
 use Closure;
 use Crawler\Container\Container;
+use Crawler\Components\Parser\ParserInterface;
 
 /**
  * 简单的过滤器实例
@@ -12,20 +13,6 @@ use Crawler\Container\Container;
  */
 class SimpleFilter implements FilterInterface
 {
-    /**
-     * 默认的链接过滤规则
-     *
-     * @var array
-     */
-    private $defaultLinkRuleGroup = [];
-
-    /**
-     * 默认的数据过滤规则
-     *
-     * @var array
-     */
-    private $defaultDataRuleGroup = [];
-
     /**
      * 链接过滤数组
      *
@@ -68,13 +55,21 @@ class SimpleFilter implements FilterInterface
      */
     private $unknowDomain = false;
 
+    /**
+     * 默认执行的链接过滤方法
+     *
+     * @var array
+     */
+    private $baseFilterLinkMap = [
+        "domainFilter",
+        "noLinkFilter"
+    ];
+
     public function __construct(string $defaultTag)
     {
         $this->defaultTag = $defaultTag;
 
         $this->filterConfig = Container::getInstance()->make('Config')['filter'];
-
-        $this->registerDefaultLinkRule();
     }
 
     /**
@@ -104,11 +99,11 @@ class SimpleFilter implements FilterInterface
     /**
      * 过滤出链接数据，用于后面的爬取
      *
-     * @param  string $tag
-     * @param  mixed  $data
-     * @return mixed
+     * @param  string          $tag
+     * @param  ParserInterface $parser
+     * @return array|bool
      */
-    public function filterLink(string $tag, $data)
+    public function filterLink(string $tag, ParserInterface $parser)
     {
         //如果是默认的tag名称，则不进行过滤
         if ($tag == $this->defaultTag) {
@@ -116,93 +111,54 @@ class SimpleFilter implements FilterInterface
         }
 
         if (isset($this->linkRuleGroup[$tag])) {
-            $data = $this->defaultFilterLink($data);
+            $resData = $this->linkRuleGroup[$tag]($parser);
 
-            return $this->linkRuleGroup[$tag]($data);
+            //如果数据不为空，则执行默认的过滤方法，清洗掉无效链接
+            if (!empty($resData)) {
+                $resData = $this->baseFilterLink($resData);
+            }
+
+            return $resData;
         } else {
             return false;
         }
     }
 
     /**
-     * 过滤出业务所需数组，提供给用户使用
+     * 过滤出业务所需数据，提供给用户使用
      *
-     * @param  string $tag
-     * @param  mixed  $data
+     * @param  string          $tag
+     * @param  ParserInterface $parser
      * @return mixed
      */
-    public function filterData(string $tag, $data)
+    public function filterData(string $tag, ParserInterface $parser)
     {
         if ($tag == $this->defaultTag) {
             return false;
         }
 
         if (isset($this->dataRuleGroup[$tag])) {
-            $data = $this->defaultFilterData($data);
-
-            return $this->dataRuleGroup[$tag]($data);
+            return $this->dataRuleGroup[$tag]($parser);
         } else {
             return false;
         }
     }
 
     /**
-     * 注册默认的过滤规则
-     *
-     * @param mixed $rule 过滤规则
-     */
-    public function registerDefaultFilterLink($rule): void
-    {
-        $this->defaultLinkRuleGroup[] = $rule;
-    }
-
-    /**
-     * 默认的链接过滤
+     * 基础链接过滤方法
+     * 在用户获取到链接后，执行基础过滤
+     * 清洗掉无效的链接
      *
      * @param  array $data
      * @return array
      */
-    private function defaultFilterLink(array $data): array
+    private function baseFilterLink(array $data): array
     {
-        foreach ($this->defaultLinkRuleGroup as $rule) {
-            $data = call_user_func($rule, [$data]);
+        foreach ($this->baseFilterLinkMap as $filter) {
+            $data = call_user_func([$this, $filter], [$data]);
         }
 
         return $data;
-    }
-
-    /**
-     * 注册默认的数据过滤规则
-     *
-     * @param mixed $rule 过滤规则
-     */
-    public function registerDefaultFilterData($rule): void
-    {
-        $this->defaultDataRuleGroup[] = $rule;
-    }
-
-    /**
-     * 默认的数据过滤
-     *
-     * @param  array $data
-     * @return array
-     */
-    private function defaultFilterData(array $data): array
-    {
-        foreach ($this->defaultDataRuleGroup as $rule) {
-            $data = call_user_func($rule, $data);
-        }
-
-        return $data;
-    }
-
-    /**
-     * 注册默认的链接过滤规则
-     */
-    private function registerDefaultLinkRule(): void
-    {
-        $this->registerDefaultFilterLink([$this, 'noLinkFilter']);
-        $this->registerDefaultFilterLink([$this, 'domainFilter']);
     }
 
     /**

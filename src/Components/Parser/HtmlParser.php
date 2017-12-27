@@ -2,7 +2,6 @@
 
 namespace Crawler\Components\Parser;
 
-use Crawler\Components\Parser\ParserInterface;
 use Closure;
 
 /**
@@ -12,13 +11,6 @@ use Closure;
  */
 class HtmlParser implements ParserInterface
 {
-    /**
-     * 待解析的内容
-     *
-     * @var string
-     */
-    private $content;
-
     /**
      * 解析核心，提供html的dom解析
      *

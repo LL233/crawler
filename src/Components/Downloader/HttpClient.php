@@ -4,7 +4,8 @@ namespace Crawler\Components\Downloader;
 
 use Crawler\Container\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Crawler\EventListener\EventTag;
+use Crawler\Events\EventTag;
+use Exception;
 
 /**
  * 通过http实现下载器
@@ -50,15 +51,23 @@ class HttpClient implements DownloaderInterface
     private $eventDispatcher;
 
     /**
+     * HttpClient解析器
+     *
+     * @var HttpClientParser
+     */
+    private $httpClientParser;
+
+    /**
      * 构造函数
      *
      * @param \GuzzleHttp\Client $client
      * @param EventDispatcher    $eventDispatcher
      */
-    public function __construct(\GuzzleHttp\Client $client, EventDispatcher $eventDispatcher)
+    public function __construct(\GuzzleHttp\Client $client, EventDispatcher $eventDispatcher, HttpClientParser $httpClientParser)
     {
         $this->guzzleHttpClient = $client;
         $this->eventDispatcher = $eventDispatcher;
+        $this->httpClientParser = $httpClientParser;
 
         $this->registerBaseEvent();
     }
@@ -80,11 +89,15 @@ class HttpClient implements DownloaderInterface
         //触发请求前的事件
         $this->eventDispatcher->dispatch(EventTag::REQUEST_BEFORE, Container::getInstance()->make('RequestEvent', ['downloader' => $this]));
 
-        $response = $this->guzzleHttpClient->request($this->requestMethod, $this->requestLink, $this->requestParams);
+        try {
+            $response = $this->guzzleHttpClient->request($this->requestMethod, $this->requestLink, $this->requestParams);
 
-        $this->clear();
-
-        return (string)$response->getBody();
+            return $this->httpClientParser->parserResponse($response);
+        } catch (Exception $e) {
+            return false;
+        } finally {
+            $this->clear();
+        }
     }
 
     /**

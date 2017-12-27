@@ -5,7 +5,7 @@ namespace Crawler\Components\SpiderController;
 use Crawler\Components\Spider\MultiSpider;
 use Crawler\Container\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Crawler\EventListener\EventTag;
+use Crawler\Events\EventTag;
 
 /**
  * 基于多进程实现的爬虫控制器
@@ -52,9 +52,18 @@ class MultiProcessSpiderController implements SpiderControllerInterface
         //爬虫启动事件派发
         $this->dispatch(EventTag::SPIDER_START);
 
-        while (($link = $this->spider->next())) {
-            $response = $this->spider->getContent($link);
-            $this->spider->filterData($response);
+        while (true) {
+            $link = $this->spider->next();
+
+            try {
+                $parser = $this->spider->getContent($link);
+                $this->spider->filterData($parser);
+            } catch (\Exception $e) {
+                //TODO:跳过本次循环，并触发一个事件
+                continue;
+            } finally {
+                //TODO:触发一个本次抓取结束的事件
+            }
         }
 
         $this->stop();

@@ -2,6 +2,8 @@
 
 namespace Crawler\Components\Downloader;
 
+use Crawler\Components\Parser\ParserInterface;
+
 /**
  * 下载器的接口
  * 所有下载器都必须实现这个接口
@@ -16,7 +18,7 @@ interface DownloaderInterface
      * @param  string $link   请求连接
      * @param  string $method 请求方式
      * @param  array  $params 请求的参数
-     * @return mixed 请求后获得的内容
+     * @return ParserInterface
      */
-    public function download(string $link, string $method = 'GET', array $params = []);
+    public function download(string $link, string $method = 'GET', array $params = []): ParserInterface;
 }

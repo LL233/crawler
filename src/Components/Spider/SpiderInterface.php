@@ -2,6 +2,8 @@
 
 namespace Crawler\Components\Spider;
 
+use Crawler\Components\Parser\ParserInterface;
+
 /**
  * 爬虫接口
  *
@@ -13,17 +15,17 @@ interface SpiderInterface
      * 获取抓取内容
      *
      * @param  mixed $link
-     * @return mixed
+     * @return ParserInterface
      */
-    public function getContent($link);
+    public function getContent($link): ParserInterface;
 
     /**
      * 清洗数据
      *
-     * @param  mixed $data
+     * @param  ParserInterface $parser
      * @return mixed
      */
-    public function filterData($data);
+    public function filterData(ParserInterface $parser);
 
     /**
      * 准备下一次的抓取

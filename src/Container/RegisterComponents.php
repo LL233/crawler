@@ -30,17 +30,14 @@ class RegisterComponents
      */
     public function register()
     {
-        //配置组件
         $this->container->bind('Config', function($app, $params){
             return new \Crawler\Components\ConfigSetting\ConfigSetting($params['config']);
         });
 
-        //\DiDom\Document
         $this->container->bind('Document', function($app){
             return new \DiDom\Document();
         });
 
-        //\Guzzle\Http\Client
         $this->container->bind('Client', function($app){
             return new \GuzzleHttp\Client([
                 'timeout' => 2.0
@@ -48,7 +45,11 @@ class RegisterComponents
         });
 
         $this->container->bind('Downloader', function($app){
-            return new \Crawler\Components\Downloader\HttpClient($app->make('Client'), $app->make('Event'));
+            return new \Crawler\Components\Downloader\HttpClient(
+                $app->make('Client'),
+                $app->make('Event'),
+                $app->make('HttpClientParser')
+            );
         });
 
         $this->container->bind('HtmlParser', function($app){
@@ -87,7 +88,7 @@ class RegisterComponents
         });
 
         $this->container->bind('SpiderEvent', function($app, $params){
-            return new \Crawler\EventListener\Events\SpiderEvent($params['spider'], $params['params']);
+            return new \Crawler\Events\SpiderEvent($params['spider'], $params['params']);
         }, true);
 
         $this->container->bind('Cookie', function($app){
@@ -95,7 +96,7 @@ class RegisterComponents
         });
 
         $this->container->bind('RequestEvent', function($app, $params){
-            return new \Crawler\EventListener\Events\RequestEvent($params['downloader']);
+            return new \Crawler\Events\RequestEvent($params['downloader']);
         }, true);
 
         $this->container->bind('HttpClientBaseEvent', function($app){

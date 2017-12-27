@@ -1,6 +1,6 @@
 <?php
 
-namespace Crawler\EventListener\Events;
+namespace Crawler\Events;
 
 use Symfony\Component\EventDispatcher\Event;
 use Crawler\Components\Downloader\DownloaderInterface;
