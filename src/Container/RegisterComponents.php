@@ -12,6 +12,13 @@ use Crawler\ComponentProvider;
 class RegisterComponents
 {
     /**
+     * 容器实例
+     *
+     * @var Container
+     */
+    private $container;
+
+    /**
      * 组件提供者
      *
      * @var array
@@ -28,6 +35,11 @@ class RegisterComponents
         \Crawler\Components\MultiProcess\MultiProcessComponentProvider::class
     ];
 
+    public function __construct()
+    {
+        $this->container = Container::getInstance();
+    }
+
     /**
      * 注册组件
      *
@@ -35,8 +47,10 @@ class RegisterComponents
      */
     public function registerComponent()
     {
+        //先注册基础组件
         $this->registerBaseComponent();
 
+        //循环所有组件提供者
         foreach ($this->componentProviders as $componentProvider) {
             $instance = new $componentProvider();
 
@@ -53,21 +67,21 @@ class RegisterComponents
      *
      * @return void
      */
-    public function registerBaseComponent()
+    private function registerBaseComponent()
     {
-        $this->container->bind('EventDispatcher', function($app){
+        $this->container->bind('EventDispatcher', function(){
             return new \Symfony\Component\EventDispatcher\EventDispatcher();
         });
 
-        $this->container->bind('SpiderEvent', function($app, $params){
+        $this->container->bind('SpiderEvent', function($container, $params){
             return new \Crawler\Events\SpiderEvent($params['spider'], $params['params']);
         }, true);
 
-        $this->container->bind('Cookie', function($app){
+        $this->container->bind('Cookie', function(){
             return new \GuzzleHttp\Cookie\FileCookieJar(__DIR__.'/cookie');
         });
 
-        $this->container->bind('RequestEvent', function($app, $params){
+        $this->container->bind('RequestEvent', function($container, $params){
             return new \Crawler\Events\RequestEvent($params['downloader']);
         }, true);
     }
