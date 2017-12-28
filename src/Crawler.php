@@ -49,6 +49,6 @@ class Crawler
     private function registerComponents()
     {
         $registerComponents = new RegisterComponents();
-        $registerComponents->register();
+        $registerComponents->registerComponent();
     }
 }

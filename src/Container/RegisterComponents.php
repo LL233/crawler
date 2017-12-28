@@ -2,7 +2,7 @@
 
 namespace Crawler\Container;
 
-use Crawler\Container\Container;
+use Crawler\ComponentProvider;
 
 /**
  * 将基本的组件在这里注册好
@@ -12,15 +12,40 @@ use Crawler\Container\Container;
 class RegisterComponents
 {
     /**
-     * 容器实例
+     * 组件提供者
      *
-     * @var Container
+     * @var array
      */
-    private $container;
+    private $componentProviders = [
+        \Crawler\Components\ConfigSetting\ConfigComponentProvider::class,
+        \Crawler\Components\Downloader\DownloaderComponentProvider::class,
+        \Crawler\Components\Filter\FilterComponentProvider::class,
+        \Crawler\Components\MatchLink\MatchLinkComponentProvider::class,
+        \Crawler\Components\Parser\ParserComponentProvider::class,
+        \Crawler\Components\Queue\QueueComponentProvider::class,
+        \Crawler\Components\Spider\SpiderComponentProvider::class,
+        \Crawler\Components\SpiderController\SpiderControllerComponentProvider::class,
+        \Crawler\Components\MultiProcess\MultiProcessComponentProvider::class
+    ];
 
-    public function __construct()
+    /**
+     * 注册组件
+     *
+     * @throws \Exception
+     */
+    public function registerComponent()
     {
-        $this->container = Container::getInstance();
+        $this->registerBaseComponent();
+
+        foreach ($this->componentProviders as $componentProvider) {
+            $instance = new $componentProvider();
+
+            if (!$instance instanceof ComponentProvider) {
+                throw new \Exception("{$componentProvider} not implement \\Crawler\\ComponentProvider");
+            }
+
+            call_user_func([$instance, 'register']);
+        }
     }
 
     /**
@@ -28,62 +53,9 @@ class RegisterComponents
      *
      * @return void
      */
-    public function register()
+    public function registerBaseComponent()
     {
-        $this->container->bind('Config', function($app, $params){
-            return new \Crawler\Components\ConfigSetting\ConfigSetting($params['config']);
-        });
-
-        $this->container->bind('Document', function($app){
-            return new \DiDom\Document();
-        });
-
-        $this->container->bind('Client', function($app){
-            return new \GuzzleHttp\Client([
-                'timeout' => 2.0
-            ]);
-        });
-
-        $this->container->bind('Downloader', function($app){
-            return new \Crawler\Components\Downloader\HttpClient(
-                $app->make('Client'),
-                $app->make('Event'),
-                $app->make('HttpClientParser')
-            );
-        });
-
-        $this->container->bind('HtmlParser', function($app){
-            return new \Crawler\Components\Parser\HtmlParser($app->make('Document'));
-        });
-
-        $this->container->bind('JsonParser', function($app){
-            return new \Crawler\Components\Parser\JsonParser();
-        });
-
-        $this->container->bind('RegexParser', function($app){
-            return new \Crawler\Components\Parser\RegexParser();
-        });
-
-        $this->container->bind('Queue', function($app){
-            return new \Crawler\Components\Queue\MemoryQueue();
-        });
-
-        $this->container->bind('MultiProcess', function($app, $params){
-            return new \Crawler\Components\MultiProcess\MainProcess($params['handler'], $params['subProcessCount']);
-        });
-
-        $this->container->bind('Spider', function($app){
-            return new \Crawler\Components\Spider\MultiSpider(
-                $app->make('Downloader'),
-                $app->make('Queue'),
-                $app->make('Filter'),
-                $app->make('MatchLink'),
-                $app->make('Event'),
-                $app
-            );
-        });
-
-        $this->container->bind('Event', function($app){
+        $this->container->bind('EventDispatcher', function($app){
             return new \Symfony\Component\EventDispatcher\EventDispatcher();
         });
 
@@ -98,17 +70,5 @@ class RegisterComponents
         $this->container->bind('RequestEvent', function($app, $params){
             return new \Crawler\Events\RequestEvent($params['downloader']);
         }, true);
-
-        $this->container->bind('HttpClientBaseEvent', function($app){
-            return new \Crawler\Components\Downloader\HttpClientBaseEvent($app->make('Spider'), $app->make('Config'));
-        });
-
-        $this->container->bind('MatchLink', function($app){
-            return new \Crawler\Components\MatchLink\MatchLinkTag();
-        });
-
-        $this->container->bind('Filter', function($app){
-            return new \Crawler\Components\Filter\SimpleFilter('default');
-        });
     }
 }
