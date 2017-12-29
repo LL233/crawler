@@ -115,6 +115,6 @@ class Container
     {
         $concrete = $this->aliases[$abstract]['concrete'];
 
-        return $concrete($this, $params);
+        return call_user_func_array($concrete, [$this, $params]);
     }
 }
