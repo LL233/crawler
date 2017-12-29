@@ -2,6 +2,7 @@
 
 namespace Crawler\Components\MultiProcess;
 
+use Crawler\Container\Container;
 use Exception;
 
 /**
@@ -14,6 +15,13 @@ use Exception;
 class MainProcess extends BaseProcess
 {
     /**
+     * 是否守护进程化
+     *
+     * @var bool
+     */
+    private $isDaemonize;
+
+    /**
      * 保存子进程的进程id
      *
      * @var array
@@ -21,25 +29,18 @@ class MainProcess extends BaseProcess
     private $subProcessPidMap = [];
 
     /**
-     * 子进程的最大数量
+     * task任务的配置
      *
-     * @var int
+     * @var array
      */
-    private $subProcessMaxCount;
-
-    /**
-     * 子进程的执行事件
-     *
-     * @var \Closure
-     */
-    private $subProcessHandle;
+    private $taskConfig = [];
 
     /**
      * 进程休眠时间
      *
      * @var float
      */
-    private $sleepTime = 1;
+    private $sleepTime = 0.1;
 
     /**
      * 进程是否处于停止状态
@@ -73,13 +74,26 @@ class MainProcess extends BaseProcess
      * 主进程构造函数
      * 设置信号监听
      *
-     * @param \Closure $handle          子进程的执行事件
-     * @param int      $subProcessCount 子进程的启动数量
+     * $taskConfig = [
+     *      "taskA" => [
+     *          "count" => 4,
+     *          "handle" => function(){}
+     *      ],
+     *      "taskB" => [
+     *          "count" => 1,
+     *          "handle" => function(){}
+     *      ]
+     * ]
+     *
+     * 子进程的数量取决于所有task的分配子进程的数量
+     *
+     * @param array $taskConfig  子进程的任务配置
+     * @param bool  $isDaemonize 是否以守护进程启动
      */
-    public function __construct(\Closure $handle, int $subProcessCount = 0)
+    public function __construct(array $taskConfig, $isDaemonize = false)
     {
-        $this->subProcessHandle = $handle;
-        $this->subProcessMaxCount = $subProcessCount;
+        $this->taskConfig = $taskConfig;
+        $this->isDaemonize = $isDaemonize;
 
         $this->init();
     }
@@ -91,6 +105,8 @@ class MainProcess extends BaseProcess
      */
     private function init()
     {
+        //检车taskConfig配置是否正确
+        $this->checkTaskConfig();
         //注册信号监听
         $this->registerSignalHandler();
         //设置守护进程
@@ -106,6 +122,20 @@ class MainProcess extends BaseProcess
     }
 
     /**
+     * 检查taskConfig的配置是否正确
+     *
+     * @throws Exception
+     */
+    private function checkTaskConfig(): void
+    {
+        foreach ($this->taskConfig as $task) {
+            if (!is_array($task) || !isset($task['count']) || !isset($task['handle']) || !$task['handle'] instanceof \Closure || $task['count'] <= 0) {
+                throw new \Exception('task config error');
+            }
+        }
+    }
+
+    /**
      * 使进程变为守护进程
      *
      * @return void
@@ -115,7 +145,7 @@ class MainProcess extends BaseProcess
     private function daemonize()
     {
         //只有在cli模式下可以变为守护进程
-        if (php_sapi_name() != 'cli') {
+        if (php_sapi_name() != 'cli' || !$this->isDaemonize) {
             return;
         }
 
@@ -155,29 +185,32 @@ class MainProcess extends BaseProcess
      */
     private function startSubProcess()
     {
-        for ($i=0; $i<$this->subProcessMaxCount; $i++) {
-            $this->makeSubProcess();
+        foreach ($this->taskConfig as $task) {
+            for ($i = 0; $i < $task['count']; $i++) {
+                $this->makeSubProcess($task['handle']);
+            }
         }
     }
 
     /**
      * 生成子进程
      *
+     * @param  \Closure $handle
      * @return void
      *
      * @throws Exception
      */
-    private function makeSubProcess()
+    private function makeSubProcess(\Closure $handle)
     {
         $pid = pcntl_fork();
 
         if ($pid == 0) {
-            //子进程
-            $subProcess = new SubProcess();
-            $subProcess->handler($this->subProcessHandle);
+            //生成子进程
+            $subProcess = Container::getInstance()->make('SubProcess');
+            $subProcess->handler($handle);
         } elseif ($pid > 0) {
             //父进程
-            $this->subProcessPidMap[$pid] = $pid;
+            $this->subProcessPidMap[$pid] = $handle;
         } else {
             //错误
             throw new Exception('fork fail in make sub process');
@@ -203,7 +236,7 @@ class MainProcess extends BaseProcess
             if ($pid > 0) {
                 //如果进程处于停止状态
                 if ($this->stopStatus != 0) {
-                    $this->stopHandler($pid);
+                    $this->stopHandle($pid);
                 }
                 //如果进程处于重启状态
                 if ($this->restartStatus != 0) {
@@ -213,6 +246,10 @@ class MainProcess extends BaseProcess
                 if ($this->stopStatus == 0 && $this->restartStatus == 0) {
                     $this->exceptionProcessHandler($pid, $status);
                 }
+            }
+
+            if (count($this->subProcessPidMap) == 0) {
+                exit(parent::STOP_EXIT);
             }
 
             sleep($this->sleepTime);
@@ -225,7 +262,7 @@ class MainProcess extends BaseProcess
      * @param  int $signal
      * @return void
      */
-    protected function signalHandler($signal)
+    public function signalHandler($signal)
     {
         switch ($signal) {
             //退出
@@ -272,7 +309,9 @@ class MainProcess extends BaseProcess
      */
     private function killSubProcess()
     {
-        foreach ($this->subProcessPidMap as $pid) {
+        $pidMap = array_keys($this->subProcessPidMap);
+
+        foreach ($pidMap as $pid) {
             //向所有子进程发送退出信号
             posix_kill($pid, SIGTERM);
         }
@@ -284,14 +323,10 @@ class MainProcess extends BaseProcess
      * @param  int $pid
      * @return void
      */
-    private function stopHandler($pid)
+    private function stopHandle($pid)
     {
         if (isset($this->subProcessPidMap[$pid])) {
             unset($this->subProcessPidMap[$pid]);
-        }
-
-        if (count($this->subProcessPidMap) == 0) {
-            exit(0);
         }
     }
 
@@ -305,16 +340,17 @@ class MainProcess extends BaseProcess
     {
         if (isset($this->subProcessPidMap[$pid])) {
             try {
-                $this->makeSubProcess();
+                $this->makeSubProcess($this->subProcessPidMap[$pid]);
                 unset($this->subProcessPidMap[$pid]);
                 $this->restartSubProcessCount++;
+
             } catch (Exception $e) {
                 //TODO:记录日志
             }
         }
 
         //如果重启子进程的数量已经达到子进程最大的数量，则停止重启状态
-        if ($this->restartSubProcessCount == $this->subProcessMaxCount) {
+        if ($this->restartSubProcessCount == count($this->subProcessPidMap)) {
             $this->restartStatus = 0;
             $this->restartSubProcessCount = 0;
         }
@@ -327,12 +363,22 @@ class MainProcess extends BaseProcess
      * @param  int $status 子进程的退出状态
      * @return void
      */
-    private function exceptionProcessHandler($pid, $status)
+    private function exceptionProcessHandler($pid, $status): void
     {
         if (isset($this->subProcessPidMap[$pid])) {
+            //如果子进程是完成任务退出，则不重启
+            if (pcntl_wifexited($status)) {
+                if (pcntl_wexitstatus($status) == parent::STOP_EXIT) {
+                    unset($this->subProcessPidMap[$pid]);
+
+                    return;
+                }
+            }
+
             //重启一个子进程
+            $this->makeSubProcess($this->subProcessPidMap[$pid]);
             unset($this->subProcessPidMap[$pid]);
-            $this->makeSubProcess();
+
 
             //TODO:记录子进程的退出状态
         }
@@ -345,13 +391,17 @@ class MainProcess extends BaseProcess
      */
     private function resetStdout()
     {
+        if (!$this->isDaemonize) {
+            return;
+        }
+
         global $STDOUT, $STDERR;
 
         //关闭标准输出和标准错误输出
         @fclose(STDOUT);
         @fclose(STDERR);
 
-        $STDOUT = fopen('/data/dev/test.log', 'a');
-        $STDERR = fopen('/data/dev/test.log', 'a');
+        $STDOUT = fopen($this->stdoutFilePath, 'a');
+        $STDERR = fopen($this->stdoutFilePath, 'a');
     }
 }

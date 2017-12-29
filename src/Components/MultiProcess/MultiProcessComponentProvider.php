@@ -13,8 +13,8 @@ class MultiProcessComponentProvider extends ComponentProvider
 {
     public function register(): void
     {
-        $this->container->bind('MainProcess', function($container, $params){
-            return new MainProcess($params['handle'], $params['subProcessCount']);
+        $this->container->bind('MultiProcess', function($container, $params){
+            return new MainProcess($params['taskConfig'], $params['isDaemonize']);
         });
 
         //子进程组件非单例模式

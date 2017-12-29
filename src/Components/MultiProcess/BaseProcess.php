@@ -11,12 +11,19 @@ namespace Crawler\Components\MultiProcess;
 abstract class BaseProcess
 {
     /**
+     * 进程退出时的状态码
+     *
+     * @var int
+     */
+    const STOP_EXIT = 233;
+
+    /**
      * 信号处理
      *
      * @param  int $signal
      * @return void
      */
-    abstract protected function signalHandler($signal);
+    abstract function signalHandler($signal);
 
     /**
      * 注册信号监听

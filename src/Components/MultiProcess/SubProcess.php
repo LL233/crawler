@@ -11,13 +11,6 @@ namespace Crawler\Components\MultiProcess;
 class SubProcess extends BaseProcess
 {
     /**
-     * 子进程每次执行完休眠时间
-     *
-     * @var float
-     */
-    private $sleepTime = 1;
-
-    /**
      * 子进程的停止状态
      *
      * @var int
@@ -35,19 +28,24 @@ class SubProcess extends BaseProcess
      * @param  \Closure $handle
      * @return void
      */
-    public function handler(\Closure $handle)
+    public function handler(\Closure $handle): void
     {
-        while (true) {
-            call_user_func($handle);
+        call_user_func($handle);
 
-            pcntl_signal_dispatch();
+        exit(parent::STOP_EXIT);
+    }
 
-            //停止进程
-            if ($this->stopStatus == 1) {
-                exit(0);
-            }
+    /**
+     * 进程状态检查
+     * 检查信号，查看进程是否处于停止状态
+     */
+    public function checkProcess(): void
+    {
+        pcntl_signal_dispatch();
 
-            sleep($this->sleepTime);
+        //停止进程
+        if ($this->stopStatus == 1) {
+            exit(0);
         }
     }
 
@@ -56,7 +54,7 @@ class SubProcess extends BaseProcess
      *
      * @return void
      */
-    private function init()
+    private function init(): void
     {
         $this->registerSignalHandler();
     }
@@ -67,7 +65,7 @@ class SubProcess extends BaseProcess
      * @param  int $signal
      * @return void
      */
-    protected function signalHandler($signal)
+    public function signalHandler($signal): void
     {
         switch ($signal) {
             //停止
