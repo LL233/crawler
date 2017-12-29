@@ -14,5 +14,8 @@
             <directory>./tests/Crawler</directory>
             <exclude>tests/Crawler/Components/MultiProcess/MainProcessTest.php</exclude>
         </testsuite>
+        <testsuite name="Process">
+            <directory>tests/Crawler/Components/MultiProcess/MainProcessTest.php</directory>
+        </testsuite>
     </testsuites>
 </phpunit>
