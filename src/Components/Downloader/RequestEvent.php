@@ -1,9 +1,8 @@
 <?php
 
-namespace Crawler\Events;
+namespace Crawler\Components\Downloader;
 
 use Symfony\Component\EventDispatcher\Event;
-use Crawler\Components\Downloader\DownloaderInterface;
 
 /**
  * 请求事件对象

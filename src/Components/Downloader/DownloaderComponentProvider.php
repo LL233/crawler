@@ -34,5 +34,9 @@ class DownloaderComponentProvider extends ComponentProvider
         $this->container->bind('HttpClientParser', function(){
             return new HttpClientParser();
         });
+
+        $this->container->bind('RequestEvent', function($container, $params){
+            return new RequestEvent($params['downloader']);
+        }, true);
     }
 }

@@ -1,9 +1,8 @@
 <?php
 
-namespace Crawler\Events;
+namespace Crawler\Components\Spider;
 
 use Symfony\Component\EventDispatcher\Event;
-use Crawler\Components\Spider\SpiderInterface;
 
 /**
  * 爬虫事件对象

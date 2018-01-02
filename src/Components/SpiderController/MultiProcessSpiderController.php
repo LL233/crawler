@@ -5,7 +5,7 @@ namespace Crawler\Components\SpiderController;
 use Crawler\Components\Spider\MultiSpider;
 use Crawler\Container\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Crawler\Events\EventTag;
+use Crawler\EventTag;
 
 /**
  * 基于多进程实现的爬虫控制器

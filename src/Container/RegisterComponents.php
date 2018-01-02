@@ -73,16 +73,8 @@ class RegisterComponents
             return new \Symfony\Component\EventDispatcher\EventDispatcher();
         });
 
-        $this->container->bind('SpiderEvent', function($container, $params){
-            return new \Crawler\Events\SpiderEvent($params['spider'], $params['params']);
-        }, true);
-
         $this->container->bind('Cookie', function(){
             return new \GuzzleHttp\Cookie\FileCookieJar(__DIR__.'/cookie');
         });
-
-        $this->container->bind('RequestEvent', function($container, $params){
-            return new \Crawler\Events\RequestEvent($params['downloader']);
-        }, true);
     }
 }

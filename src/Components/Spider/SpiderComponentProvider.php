@@ -14,7 +14,7 @@ class SpiderComponentProvider extends ComponentProvider
     public function register(): void
     {
         $this->container->bind('Spider', function($container){
-            return new \Crawler\Components\Spider\MultiSpider(
+            return new MultiSpider(
                 $container->make('Downloader'),
                 $container->make('Queue'),
                 $container->make('Filter'),
@@ -23,5 +23,9 @@ class SpiderComponentProvider extends ComponentProvider
                 $container
             );
         });
+
+        $this->container->bind('SpiderEvent', function($container, $params){
+            return new SpiderEvent($params['spider'], $params['params']);
+        }, true);
     }
 }

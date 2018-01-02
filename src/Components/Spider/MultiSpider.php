@@ -7,7 +7,7 @@ use Crawler\Components\Downloader\DownloaderInterface;
 use Crawler\Components\Queue\QueueInterface;
 use Crawler\Components\MatchLink\MatchLinkInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Crawler\Events\EventTag;
+use Crawler\EventTag;
 use Crawler\Container\Container;
 use Crawler\Components\Parser\ParserInterface;
 use Exception;

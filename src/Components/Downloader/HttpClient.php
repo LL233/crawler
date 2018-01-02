@@ -4,7 +4,7 @@ namespace Crawler\Components\Downloader;
 
 use Crawler\Container\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Crawler\Events\EventTag;
+use Crawler\EventTag;
 use Exception;
 
 /**
