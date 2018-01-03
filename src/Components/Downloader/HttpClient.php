@@ -5,6 +5,7 @@ namespace Crawler\Components\Downloader;
 use Crawler\Container\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Crawler\EventTag;
+use Crawler\Components\Parser\ParserInterface;
 use Exception;
 
 /**
@@ -68,8 +69,6 @@ class HttpClient implements DownloaderInterface
         $this->guzzleHttpClient = $client;
         $this->eventDispatcher = $eventDispatcher;
         $this->httpClientParser = $httpClientParser;
-
-        $this->registerBaseEvent();
     }
 
     /**
@@ -80,7 +79,7 @@ class HttpClient implements DownloaderInterface
      * @param  array  $params 请求参数
      * @return mixed 请求后获得的内容
      */
-    public function download(string $link, string $method = 'GET', array $params = [])
+    public function download(string $link, string $method = 'GET', array $params = []): ParserInterface
     {
         $this->requestParams = $params;
         $this->requestMethod = $method;
@@ -94,18 +93,10 @@ class HttpClient implements DownloaderInterface
 
             return $this->httpClientParser->parserResponse($response);
         } catch (Exception $e) {
-            return false;
+            throw new \Exception($e->getMessage());
         } finally {
             $this->clear();
         }
-    }
-
-    /**
-     * 注册请求前会触发的事件
-     */
-    private function registerBaseEvent(): void
-    {
-        $this->eventDispatcher->addListener(EventTag::REQUEST_BEFORE, [Container::getInstance()->make('HttpClientBaseEvent'), 'baseEvent'], 0);
     }
 
     /**

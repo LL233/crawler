@@ -3,7 +3,7 @@
 namespace Crawler\Components\Downloader;
 
 use Crawler\Components\ConfigSetting\ConfigSetting;
-use Crawler\Components\Spider\SpiderInterface;
+use Crawler\Components\LinkTag\LinkTagInterface;
 use Crawler\Container\Container;
 
 /**
@@ -23,9 +23,9 @@ class HttpClientBaseEvent
     /**
      * 爬虫实例
      *
-     * @var SpiderInterface
+     * @var LinkTagInterface
      */
-    private $spider;
+    private $linkTag;
 
     /**
      * 请求的配置数组
@@ -46,12 +46,12 @@ class HttpClientBaseEvent
     ];
 
     /**
-     * @param SpiderInterface $spider
-     * @param ConfigSetting   $config
+     * @param LinkTagInterface $spider
+     * @param ConfigSetting    $config
      */
-    public function __construct(SpiderInterface $spider, ConfigSetting $configSetting)
+    public function __construct(LinkTagInterface $linkTag, ConfigSetting $configSetting)
     {
-        $this->spider = $spider;
+        $this->linkTag = $linkTag;
         $this->config = $configSetting['request'] ?? [];
     }
 
@@ -76,7 +76,7 @@ class HttpClientBaseEvent
     {
         //如果没有设置请求参数，则从配置中获取
         if (empty($this->client->requestParams)) {
-            $this->client->requestParams = $this->config[$this->spider->getTag()] ?? [];
+            $this->client->requestParams = $this->config[$this->linkTag->getTag()] ?? [];
         }
     }
 
