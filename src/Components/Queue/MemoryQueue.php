@@ -14,7 +14,7 @@ class MemoryQueue implements QueueInterface
     /**
      * 入队
      *
-     * @param mixed $value
+     * @param  mixed $value
      * @return void
      */
     public function push($value)
