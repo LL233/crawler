@@ -2,8 +2,6 @@
 
 namespace Crawler\Components\Parser;
 
-use Crawler\Components\Parser\ParserInterface;
-
 /**
  * 正则表达式解析器
  * 使用正则表达式对内容进行解析

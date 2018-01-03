@@ -2,8 +2,6 @@
 
 namespace Crawler\Components\Parser;
 
-use Crawler\Components\Parser\ParserInterface;
-
 /**
  * json数据的解析器
  *
