@@ -2,12 +2,14 @@
 
 namespace Crawler\Components\LinkTag;
 
+use Exception;
+
 /**
  * 根据链接匹配出一个标识
  *
  * @author LL
  */
-class LinkTag implements MatchLinkInterface
+class LinkTag implements LinkTagInterface
 {
     /**
      * 存储规则的数组
@@ -31,6 +33,13 @@ class LinkTag implements MatchLinkInterface
     private $defaultTag = 'defalut';
 
     /**
+     * 当前的tag
+     *
+     * @var string
+     */
+    private $currentTag = '';
+
+    /**
      * 设置链接匹配规则
      *
      * @param string $tag
@@ -46,26 +55,48 @@ class LinkTag implements MatchLinkInterface
      * 根据链接进行匹配
      *
      * @param  string $link
-     * @return string
+     * @return LinkTagInterface
      */
-    public function match(string $link): string
+    public function match(string $link): LinkTagInterface
     {
-        foreach ($this->ruleGroup as $k=>$rule) {
-            if (preg_match($rule, $link)) {
-                return $this->tagGroup[$k];
+        //如果当前链接没有标识
+        if (empty($this->currentTag)) {
+            //根据规则匹配出标识
+            foreach ($this->ruleGroup as $k => $rule) {
+                if (preg_match($rule, $link)) {
+                    $this->currentTag = $this->tagGroup[$k];
+                }
+            }
+
+            //如果所有规则都没有匹配到，则返回默认的标识
+            if (empty($this->currentTag)) {
+                $this->currentTag = $this->defaultTag;
             }
         }
 
-        return $this->defaultTag;
+        return $this;
     }
 
     /**
-     * 获取默认的tag名称
+     * 获取当前标识
      *
      * @return string
+     * @throws Exception
      */
-    public function getDefaultTag(): string
+    public function getTag(): string
     {
-        return $this->defaultTag;
+        if (empty($this->currentTag)) {
+            throw new Exception('do not match before get');
+        }
+
+        return $this->currentTag;
+    }
+
+    /**
+     * 清除标识
+     */
+    public function clean(): void
+    {
+        $this->currentTag = '';
     }
 }

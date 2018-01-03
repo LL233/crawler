@@ -1,7 +1,45 @@
 <?php
+
+namespace Crawler\Components\LinkTag;
+
 /**
- * Created by PhpStorm.
- * User: YuJun
- * Date: 2018/1/2
- * Time: 15:45
+ * 链接标识接口
+ * 这个类用来匹配与当前链接符合的标识
+ * 存储并返回这个标识给依赖它的对象使用
+ * 当链接改变时应当清除已匹配出的标识
+ *
+ * @author LL
  */
+interface LinkTagInterface
+{
+    /**
+     * 设置链接匹配标识的规则
+     *
+     * @param string $tag  标识名
+     * @param mixed  $rule 匹配规则
+     */
+    public function setRule(string $tag, $rule): void;
+
+    /**
+     * 根据当前链接匹配出标识
+     *
+     * @param  string $link
+     */
+    public function match(string $link): LinkTagInterface;
+
+    /**
+     * 获取根据链接匹配出的标识
+     * 如果没有先执行match方法而直接执行getTag方法
+     * 则抛出一个异常
+     *
+     * @return string
+     *
+     * @throws \Exception
+     */
+    public function getTag(): string;
+
+    /**
+     * 清除当前的标识
+     */
+    public function clean(): void;
+}
