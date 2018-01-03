@@ -40,13 +40,4 @@ interface SpiderInterface
      * @return mixed
      */
     public function end();
-
-    /**
-     * 获取爬虫当前的标识
-     * 这个标识可以是任意类型
-     * 但一定要能标记出爬虫当前爬取的链接
-     *
-     * @return mixed
-     */
-    public function getTag();
 }

@@ -4,8 +4,8 @@ namespace Crawler\Components\Spider;
 
 use Crawler\Components\Filter\FilterInterface;
 use Crawler\Components\Downloader\DownloaderInterface;
+use Crawler\Components\LinkTag\LinkTagInterface;
 use Crawler\Components\Queue\QueueInterface;
-use Crawler\Components\MatchLink\MatchLinkInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Crawler\EventTag;
 use Crawler\Container\Container;
@@ -43,9 +43,9 @@ class MultiSpider implements SpiderInterface
     /**
      * 链接匹配
      *
-     * @var MatchLinkInterface
+     * @var LinkTagInterface
      */
-    private $matchLink;
+    private $linkTag;
 
     /**
      * 事件派发
@@ -53,13 +53,6 @@ class MultiSpider implements SpiderInterface
      * @var EventDispatcher
      */
     private $eventDispatcher;
-
-    /**
-     * 容器实例
-     *
-     * @var Container
-     */
-    private $container;
 
     /**
      * 当前链接对应标识
@@ -79,16 +72,14 @@ class MultiSpider implements SpiderInterface
         DownloaderInterface $downloader,
         QueueInterface $queue,
         FilterInterface $filter,
-        MatchLinkInterface $matchLink,
-        EventDispatcher $event,
-        Container $container
+        LinkTagInterface $linkTag,
+        EventDispatcher $event
     ) {
         $this->downloader = $downloader;
         $this->queue = $queue;
         $this->filter = $filter;
-        $this->matchLink = $matchLink;
+        $this->linkTag = $linkTag;
         $this->eventDispatcher = $event;
-        $this->container = $container;
     }
 
     /**
@@ -167,22 +158,12 @@ class MultiSpider implements SpiderInterface
     /**
      * 获取当前链接所对应的tag
      *
-     * @return string
-     */
-    public function getTag(): string
-    {
-        return $this->tag;
-    }
-
-    /**
-     * 获取当前链接所对应的tag
-     *
      * @param string $link
      */
     private function setCurrentLink(string $link): void
     {
         $this->currentLink = $link;
-        $this->tag = $this->matchLink->match($this->currentLink);
+        $this->tag = $this->linkTag->match($this->currentLink)->getTag();
     }
 
     /**
@@ -193,7 +174,7 @@ class MultiSpider implements SpiderInterface
      */
     private function dispatch(string $eventTag, array $params = []): void
     {
-        $this->eventDispatcher->dispatch($eventTag, $this->container->make('SpiderEvent', [
+        $this->eventDispatcher->dispatch($eventTag, Container::getInstance()->make('SpiderEvent', [
             "spider" => $this,
             "params" => $params
         ]));

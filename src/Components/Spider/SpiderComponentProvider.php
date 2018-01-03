@@ -18,9 +18,8 @@ class SpiderComponentProvider extends ComponentProvider
                 $container->make('Downloader'),
                 $container->make('Queue'),
                 $container->make('Filter'),
-                $container->make('MatchLink'),
-                $container->make('Event'),
-                $container
+                $container->make('LinkTag'),
+                $container->make('EventDispatcher')
             );
         });
 
