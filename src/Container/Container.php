@@ -4,6 +4,7 @@ namespace Crawler\Container;
 
 use Closure;
 use Exception;
+use Crawler\ComponentProvider;
 
 /**
  * 组件容器
@@ -35,6 +36,23 @@ class Container
      * @var array
      */
     private $instances = [];
+
+    /**
+     * 组件提供者
+     *
+     * @var array
+     */
+    private $providerMap = [
+        \Crawler\Components\ConfigSetting\ConfigComponentProvider::class,
+        \Crawler\Components\Downloader\DownloaderComponentProvider::class,
+        \Crawler\Components\Filter\FilterComponentProvider::class,
+        \Crawler\Components\LinkTag\LinkTagComponentProvider::class,
+        \Crawler\Components\Parser\ParserComponentProvider::class,
+        \Crawler\Components\Queue\QueueComponentProvider::class,
+        \Crawler\Components\Spider\SpiderComponentProvider::class,
+        \Crawler\Components\SpiderController\SpiderControllerComponentProvider::class,
+        \Crawler\Components\MultiProcess\MultiProcessComponentProvider::class
+    ];
 
     /**
      * 设置并返回全局可用容器实例
@@ -116,5 +134,45 @@ class Container
         $concrete = $this->aliases[$abstract]['concrete'];
 
         return call_user_func_array($concrete, [$this, $params]);
+    }
+
+    /**
+     * 注册组件
+     *
+     * @throws Exception
+     */
+    public function register(): void
+    {
+        $this->registerBaseComponent();
+
+        //循环所有组件提供者
+        foreach ($this->providerMap as $provider) {
+            $instance = new $provider();
+
+            if (!$instance instanceof ComponentProvider) {
+                throw new \Exception("{$provider} not implement \\Crawler\\ComponentProvider");
+            }
+
+            //执行register方法，绑定容器
+            call_user_func([$instance, 'register']);
+            //执行listen方法，绑定事件
+            call_user_func([$instance, 'listen'], $this->make('EventDispatcher'));
+        }
+    }
+
+    /**
+     * 注册基础组件
+     *
+     * @throws Exception
+     */
+    private function registerBaseComponent(): void
+    {
+        $this->bind('EventDispatcher', function(){
+            return new \Symfony\Component\EventDispatcher\EventDispatcher();
+        });
+
+        $this->bind('Cookie', function(){
+            return new \GuzzleHttp\Cookie\FileCookieJar(__DIR__.'/cookie');
+        });
     }
 }
