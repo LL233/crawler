@@ -22,23 +22,15 @@ class MultiProcessSpiderController implements SpiderControllerInterface
     private $spider;
 
     /**
-     * 容器实例
-     *
-     * @var Container
-     */
-    private $container;
-
-    /**
      * 事件派发
      *
      * @var EventDispatcher
      */
     private $eventDispatcher;
 
-    public function __construct(MultiSpider $spider, Container $container, EventDispatcher $event)
+    public function __construct(MultiSpider $spider, EventDispatcher $event)
     {
         $this->spider = $spider;
-        $this->container = $container;
         $this->eventDispatcher = $event;
     }
 
@@ -53,20 +45,19 @@ class MultiProcessSpiderController implements SpiderControllerInterface
         $this->dispatch(EventTag::SPIDER_START);
 
         while (true) {
-            $link = $this->spider->next();
-
-            try {
-                $parser = $this->spider->getContent($link);
-                $this->spider->filterData($parser);
-            } catch (\Exception $e) {
-                //TODO:跳过本次循环，并触发一个事件
-                continue;
-            } finally {
-                //TODO:触发一个本次抓取结束的事件
+            if ($link = $this->spider->next()) {
+                try {
+                    $parser = $this->spider->getContent($link);
+                    $this->spider->filterData($parser);
+                } catch (\Exception $e) {
+                    //TODO:触发一个抓取失败的事件
+                } finally {
+                    //TODO:触发一个本次抓取结束的事件
+                }
+            } else {
+                $this->stop();
             }
         }
-
-        $this->stop();
     }
 
     /**
@@ -86,8 +77,9 @@ class MultiProcessSpiderController implements SpiderControllerInterface
      */
     private function dispatch(string $eventTag): void
     {
-        $this->eventDispatcher->dispatch($eventTag, $this->container->make('SpiderEvent', [
-            'spider' => $this->spider
+        $this->eventDispatcher->dispatch($eventTag, Container::getInstance()->make('SpiderEvent', [
+            'spider' => $this->spider,
+            'params' => []
         ]));
     }
 }
