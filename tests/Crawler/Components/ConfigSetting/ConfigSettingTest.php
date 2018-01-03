@@ -12,7 +12,7 @@ class ConfigSettingTest extends TestCase
     {
         parent::__construct();
 
-        $this->config = $this->app->make('Config', [
+        $this->config = $this->container->make('Config', [
             'config' => [
                 'host' => '127.0.0.1',
                 'name' => 'liulu',
