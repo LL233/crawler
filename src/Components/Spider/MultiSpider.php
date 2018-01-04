@@ -5,7 +5,7 @@ namespace Crawler\Components\Spider;
 use Crawler\Components\Filter\FilterInterface;
 use Crawler\Components\Downloader\DownloaderInterface;
 use Crawler\Components\LinkTag\LinkTagInterface;
-use Crawler\Components\Queue\QueueInterface;
+use Crawler\Components\LinkManager\LinkManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Crawler\EventTag;
 use Crawler\Container\Container;
@@ -36,9 +36,9 @@ class MultiSpider implements SpiderInterface
     /**
      * 队列
      *
-     * @var QueueInterface
+     * @var LinkManagerInterface
      */
-    private $queue;
+    private $linkManager;
 
     /**
      * 链接匹配
@@ -70,13 +70,13 @@ class MultiSpider implements SpiderInterface
 
     public function __construct(
         DownloaderInterface $downloader,
-        QueueInterface $queue,
+        LinkManagerInterface $linkManager,
         FilterInterface $filter,
         LinkTagInterface $linkTag,
         EventDispatcher $event
     ) {
         $this->downloader = $downloader;
-        $this->queue = $queue;
+        $this->linkManager = $linkManager;
         $this->filter = $filter;
         $this->linkTag = $linkTag;
         $this->eventDispatcher = $event;
@@ -127,15 +127,15 @@ class MultiSpider implements SpiderInterface
     /**
      * 准备下一次的抓取
      *
-     * @return mixed
+     * @return string
      */
-    public function next()
+    public function next(): string
     {
         $this->matchLink = '';
         $this->tag = '';
 
-        //从队列中获取下一个链接
-        $nextLink = $this->queue->pop();
+        //获取下一个链接
+        $nextLink = $this->linkManager->getLink();
 
         $this->dispatch(EventTag::SPIDER_NEXT_LINK_AFTER, ["nextLink" => $nextLink]);
 

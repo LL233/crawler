@@ -23,16 +23,16 @@ interface SpiderInterface
      * 清洗数据
      *
      * @param  ParserInterface $parser
-     * @return mixed
+     * @return void
      */
-    public function filterData(ParserInterface $parser);
+    public function filterData(ParserInterface $parser): void;
 
     /**
      * 准备下一次的抓取
      *
      * @return mixed
      */
-    public function next();
+    public function next(): string;
 
     /**
      * 抓取结束
