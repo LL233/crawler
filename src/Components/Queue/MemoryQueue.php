@@ -14,10 +14,10 @@ class MemoryQueue implements QueueInterface
     /**
      * 入队
      *
-     * @param  mixed $value
+     * @param  array $value
      * @return void
      */
-    public function push($value)
+    public function push(array $value): void
     {
         array_push($this->queue, $value);
     }
@@ -25,20 +25,20 @@ class MemoryQueue implements QueueInterface
     /**
      * 出队
      *
-     * @return mixed
+     * @return string
      */
-    public function pop()
+    public function pop(): string
     {
-        return array_pop($this->queue);
+        return ($popData = array_pop($this->queue)) != null ? $popData : '';
     }
 
     /**
      * 判断是否在队列中
      *
-     * @param  mixed $value
+     * @param  string $value
      * @return bool
      */
-    public function has($value)
+    public function has(string $value): bool
     {
         return in_array($this->queue, $value);
     }

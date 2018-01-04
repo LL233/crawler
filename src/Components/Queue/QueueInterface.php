@@ -12,30 +12,30 @@ interface QueueInterface
     /**
      * 入队
      *
-     * @param mixed $value
+     * @param  array $value
      * @return void
      */
-    public function push($value);
+    public function push(array $value): void;
 
     /**
      * 出队
      *
-     * @return mixed
+     * @return string
      */
-    public function pop();
+    public function pop(): string;
 
     /**
      * 判断是否在队列中
      *
-     * @param  mixed $value
+     * @param  string $value
      * @return bool
      */
-    public function has($value);
+    public function has(string $value): bool;
 
     /**
      * 判断队列是否为空
      *
      * @return bool
      */
-    public function isEmpty();
+    public function isEmpty(): bool;
 }
