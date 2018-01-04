@@ -9,6 +9,11 @@ namespace Crawler\Components\Queue;
  */
 class MemoryQueue implements QueueInterface
 {
+    /**
+     * 以数组形式保存队列
+     *
+     * @var array
+     */
     private $queue = [];
 
     /**
