@@ -53,8 +53,26 @@ class MemoryQueue implements QueueInterface
      *
      * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return empty($this->queue);
+    }
+
+    /**
+     * 将数组中与队列中重复的数据删除
+     * 并将删除后的数组返回
+     *
+     * @param  array $data
+     * @return array
+     */
+    public function removeRepeat(array $data): array
+    {
+        foreach ($data as $k=>$v) {
+            if ($this->has($v)) {
+                unset($data[$k]);
+            }
+        }
+
+        return $data;
     }
 }

@@ -32,10 +32,19 @@ interface GarbageInterface
      * @param  mixed $data
      * @return bool
      */
-    public function isIn($data): bool;
+    public function has($data): bool;
 
     /**
      * 清空垃圾堆
      */
     public function clean(): void;
+
+    /**
+     * 将数组中与垃圾堆中重复的数据删除
+     * 并将删除后的数组返回
+     *
+     * @param  array $data
+     * @return array
+     */
+    public function removeRepeat(array $data): array;
 }

@@ -38,4 +38,13 @@ interface QueueInterface
      * @return bool
      */
     public function isEmpty(): bool;
+
+    /**
+     * 将数组中与队列中重复的数据删除
+     * 并将删除后的数组返回
+     *
+     * @param  array $data
+     * @return array
+     */
+    public function removeRepeat(array $data): array;
 }

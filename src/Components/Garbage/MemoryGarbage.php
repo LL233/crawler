@@ -46,7 +46,7 @@ class MemoryGarbage implements GarbageInterface
      * @param  mixed $data
      * @return bool
      */
-    public function isIn($data): bool
+    public function has($data): bool
     {
         return in_array($data, $this->garbageData);
     }
@@ -59,4 +59,21 @@ class MemoryGarbage implements GarbageInterface
         unset($this->garbageData);
     }
 
+    /**
+     * 将数组中与垃圾堆中重复的数据删除
+     * 并将删除后的数组返回
+     *
+     * @param  array $data
+     * @return array
+     */
+    public function removeRepeat(array $data): array
+    {
+        foreach ($data as $k=>$v) {
+            if ($this->has($v)) {
+                unset($data[$k]);
+            }
+        }
+
+        return $data;
+    }
 }
