@@ -13,6 +13,5 @@ class TestCase extends BaseCase
         parent::__construct();
 
         $this->container = \Crawler\Container\Container::getInstance();
-        $this->container->register();
     }
 }
