@@ -71,7 +71,7 @@ class LinkManager implements LinkManagerInterface
     /**
      * 保存链接
      *
-     * @param array $link
+     * @param  array $link
      */
     public function saveLink(array $links): void
     {
