@@ -40,6 +40,7 @@ class HttpClientBaseEvent
      * @var array
      */
     private $baseEventMap = [
+        "matchTag",
         "setRequestConfig",
         "setCookie",
         "forgeClient"
@@ -67,6 +68,14 @@ class HttpClientBaseEvent
         foreach ($this->baseEventMap as $event) {
             call_user_func([$this, $event]);
         }
+    }
+
+    /**
+     * 根据链接匹配tag
+     */
+    private function matchTag(): void
+    {
+        $this->linkTag->match($this->client->requestLink);
     }
 
     /**

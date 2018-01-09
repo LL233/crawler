@@ -81,8 +81,8 @@ class HttpClientParser
     private function getContentType()
     {
         //如果没有Content-Type头，则默认为text/html;charset=utf-8
-        if ($this->response->hasHeader('Content-Type')) {
-            $contentType = $this->response->getHeader('Content-Type');
+        if (isset($this->response->hasHeader('Content-Type')[0])) {
+            $contentType = $this->response->getHeader('Content-Type')[0];
         } else {
             $contentType = 'text/html;charset=utf-8';
         }

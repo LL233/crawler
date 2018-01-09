@@ -93,7 +93,7 @@ class HttpClient implements DownloaderInterface
 
             return $this->httpClientParser->parserResponse($response);
         } catch (Exception $e) {
-            throw new \Exception($e->getMessage());
+            throw new Exception($e->getMessage());
         } finally {
             $this->clear();
         }

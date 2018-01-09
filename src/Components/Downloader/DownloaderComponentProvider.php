@@ -47,6 +47,6 @@ class DownloaderComponentProvider extends ComponentProvider
         $dispatcher->addListener(EventTag::REQUEST_BEFORE, function(RequestEvent $requestEvent){
             $httpClientBaseEvent = $this->container->make('HttpClientBaseEvent');
             $httpClientBaseEvent->baseEvent($requestEvent->downloader);
-        });
+        }, 100);
     }
 }
