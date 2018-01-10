@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit bootstrap="tests/bootstrap.php"
+        colors="true"
         convertErrorsToExceptions="true"
         convertNoticesToExceptions="true"
         convertWarningsToExceptions="true"
         processIsolation="false"
         stopOnFailure="true"
-        verbose="true">
+        verbose="true"
+        debug="true">
     <testsuites>
         <testsuite name="Crawler Test">
             <directory>./tests/Crawler</directory>
