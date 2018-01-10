@@ -97,7 +97,7 @@ class MultiSpider implements SpiderInterface
 
         $parser = $this->downloader->download($link);
 
-        if (!$parser) {
+        if ($parser) {
             $this->dispatch(EventTag::SPIDER_GET_CONTENT_AFTER, ["parser" => $parser]);
 
             return $parser;
