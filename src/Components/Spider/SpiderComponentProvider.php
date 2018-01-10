@@ -16,7 +16,7 @@ class SpiderComponentProvider extends ComponentProvider
         $this->container->bind('Spider', function($container){
             return new MultiSpider(
                 $container->make('Downloader'),
-                $container->make('Queue'),
+                $container->make('LinkManager'),
                 $container->make('Filter'),
                 $container->make('LinkTag'),
                 $container->make('EventDispatcher')

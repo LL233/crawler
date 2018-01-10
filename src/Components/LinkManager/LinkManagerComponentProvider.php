@@ -33,10 +33,10 @@ class LinkManagerComponentProvider extends ComponentProvider
             $linkManager = $this->container->make('LinkManager');
             $queue = $this->container->make('Queue');
 
-            if ($queue->isEmpaty()) {
+            if ($queue->isEmpty()) {
                 $config = $this->container->make('Config');
 
-                $linkManager->saveLink($config['startLink']);
+                $linkManager->saveLink([$config['startLink']]);
             }
         }, 100);
 
