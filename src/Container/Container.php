@@ -51,7 +51,9 @@ class Container
         \Crawler\Components\Queue\QueueComponentProvider::class,
         \Crawler\Components\Spider\SpiderComponentProvider::class,
         \Crawler\Components\SpiderController\SpiderControllerComponentProvider::class,
-        \Crawler\Components\MultiProcess\MultiProcessComponentProvider::class
+        \Crawler\Components\MultiProcess\MultiProcessComponentProvider::class,
+        \Crawler\Components\LinkManager\LinkManagerComponentProvider::class,
+        \Crawler\Components\Garbage\GarbageComponentProvider::class
     ];
 
     /**
