@@ -76,4 +76,28 @@ class SpiderEvent extends Event implements \ArrayAccess
     {
         return isset($this->params[$offset]);
     }
+
+    /**
+     * 魔术方法__get的实现
+     * 将获取属性映射到params数组
+     *
+     * @param  mixed $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        return $this->params[$name];
+    }
+
+    /**
+     * 魔术方法__set的实现
+     * 将设置属性映射到params数组
+     *
+     * @param mixed $name
+     * @param mixed $value
+     */
+    public function __set($name, $value)
+    {
+        $this->params[$name] = $value;
+    }
 }
