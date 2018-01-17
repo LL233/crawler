@@ -101,15 +101,10 @@ class SimpleFilter implements FilterInterface
      *
      * @param  string          $tag
      * @param  ParserInterface $parser
-     * @return array|bool
+     * @return array
      */
-    public function filterLink(string $tag, ParserInterface $parser)
+    public function filterLink(string $tag, ParserInterface $parser): array
     {
-        //如果是默认的tag名称，则不进行过滤
-        if ($tag == $this->defaultTag) {
-            return false;
-        }
-
         if (isset($this->linkRuleGroup[$tag])) {
             $resData = $this->linkRuleGroup[$tag]($parser);
 
@@ -120,7 +115,8 @@ class SimpleFilter implements FilterInterface
 
             return $resData;
         } else {
-            return false;
+            //如果没有设置过滤规则，则返回一个空数组
+            return [];
         }
     }
 
@@ -129,18 +125,14 @@ class SimpleFilter implements FilterInterface
      *
      * @param  string          $tag
      * @param  ParserInterface $parser
-     * @return mixed
+     * @return array
      */
-    public function filterData(string $tag, ParserInterface $parser)
+    public function filterData(string $tag, ParserInterface $parser): array
     {
-        if ($tag == $this->defaultTag) {
-            return false;
-        }
-
         if (isset($this->dataRuleGroup[$tag])) {
             return $this->dataRuleGroup[$tag]($parser);
         } else {
-            return false;
+            return [];
         }
     }
 
