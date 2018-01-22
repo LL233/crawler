@@ -81,7 +81,7 @@ class SimpleFilter implements FilterInterface
     public function setFilterLinkRule(string $tag, Closure $rule): void
     {
         //设置链接过滤规则，并将闭包的$this作用域绑定到当前对象
-        $this->linkRuleGroup[$tag] = $rule->call($this);
+        $this->linkRuleGroup[$tag] = $rule->bindTo($this);
     }
 
     /**
@@ -93,7 +93,7 @@ class SimpleFilter implements FilterInterface
     public function setFilterDataRule(string $tag, Closure $rule): void
     {
         //设置链接过滤规则，并将闭包的$this作用域绑定到当前对象
-        $this->dataRuleGroup[$tag] = $rule->call($this);
+        $this->dataRuleGroup[$tag] = $rule->bindTo($this);
     }
 
     /**
