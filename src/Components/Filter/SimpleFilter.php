@@ -35,11 +35,11 @@ class SimpleFilter implements FilterInterface
     private $defaultTag;
 
     /**
-     * 过滤规则的相关设置
+     * 配置数组
      *
      * @var array
      */
-    private $filterConfig;
+    private $config;
 
     /**
      * 当前的域名
@@ -69,7 +69,7 @@ class SimpleFilter implements FilterInterface
     {
         $this->defaultTag = $defaultTag;
 
-        $this->filterConfig = Container::getInstance()->make('Config')['filter'];
+        $this->config = Container::getInstance()->make('Config');
     }
 
     /**
@@ -113,7 +113,8 @@ class SimpleFilter implements FilterInterface
                 $resData = $this->baseFilterLink($resData);
             }
 
-            return $resData;
+            //如果不为空，则重置数组key，如果为空，则直接返回空
+            return !empty($resData) ? array_values($resData) : [];
         } else {
             //如果没有设置过滤规则，则返回一个空数组
             return [];
@@ -147,7 +148,7 @@ class SimpleFilter implements FilterInterface
     private function baseFilterLink(array $data): array
     {
         foreach ($this->baseFilterLinkMap as $filter) {
-            $data = call_user_func([$this, $filter], [$data]);
+            $data = call_user_func([$this, $filter], $data);
         }
 
         return $data;
@@ -161,29 +162,30 @@ class SimpleFilter implements FilterInterface
      */
     private function domainFilter(array $data): array
     {
-        if (!($this->filterConfig['inDomain'] ?? false)) {
+        if (!($this->config['filter']['inDomain'] ?? false)) {
             return $data;
         }
 
-        $domains = Container::getInstance()->make('Config')['domains'];
+        $domains = $this->config['domains'];
 
         foreach ($data as $k=>$v) {
             $isDelete = true;
 
             foreach ($domains as $domain) {
                 //匹配链接是否包含域名
-                if (preg_match('(http|https|HTTP|HTTPS):\/\/(' . $domain . ')+\/[^\s]+', $v)) {
+                if (preg_match('/^(http|https|HTTP|HTTPS):\/\/(' . $domain . ')\/[^\s]+$/', $v)) {
                     $isDelete = false;
                 }
-                //匹配链接是否是相对路径
-                if (!preg_match('\/[^\s]+', $v)) {
-                    //如果已经被标记为无法获取域名，则删除该链接
-                    if (!$this->unknowDomain) {
-                        //如果拼接域名成功，则保留该链接，否则删除
-                        if (($link = $this->stitchingLink($v)) != false) {
-                            $isDelete = false;
-                            $data[$k] = $link;
-                        }
+            }
+
+            //匹配链接是否是相对路径
+            if (preg_match('/^\/[^\s]+$/', $v)) {
+                //如果已经被标记为无法获取域名，则删除该链接
+                if (!$this->unknowDomain) {
+                    //如果拼接域名成功，则保留该链接，否则删除
+                    if (($link = $this->stitchingLink($v)) != false) {
+                        $isDelete = false;
+                        $data[$k] = $link;
                     }
                 }
             }
@@ -233,7 +235,7 @@ class SimpleFilter implements FilterInterface
 
         $matchData = [];
 
-        preg_match('(?P<domain>(http|https|HTTP|HTTPS)\:\/\/[^\s^\/]+)\/[^s]+', $currentLink, $matchData);
+        preg_match('/^(?P<domain>(http|https|HTTP|HTTPS)\:\/\/[^\s^\/]+)\/[^\s]+$/', $currentLink, $matchData);
 
         $this->currentDomain = $matchData['domain'] ?? '';
 
@@ -252,9 +254,11 @@ class SimpleFilter implements FilterInterface
     private function noLinkFilter(array $data): array
     {
         foreach ($data as $k=>$v) {
-            if (!preg_match('^(http|https|HTTP|HTTPS):\/\/[^s]+$', $v)) {
+            if (!preg_match('/^(http|https|HTTP|HTTPS):\/\/[^s]+$/', $v)) {
                 unset($data[$k]);
             }
         }
+
+        return $data;
     }
 }
