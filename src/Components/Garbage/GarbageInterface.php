@@ -37,7 +37,7 @@ interface GarbageInterface
     /**
      * 清空垃圾堆
      */
-    public function clean(): void;
+    public function clear(): void;
 
     /**
      * 将数组中与垃圾堆中重复的数据删除

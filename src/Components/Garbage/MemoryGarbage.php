@@ -24,7 +24,7 @@ class MemoryGarbage implements GarbageInterface
     public function put($data): void
     {
         if (is_array($data)) {
-            array_merge($this->garbageData, $data);
+            $this->garbageData = array_merge($this->garbageData, $data);
         } else {
             array_push($this->garbageData, $data);
         }
@@ -54,9 +54,10 @@ class MemoryGarbage implements GarbageInterface
     /**
      * 清空垃圾堆
      */
-    public function clean(): void
+    public function clear(): void
     {
         unset($this->garbageData);
+        $this->garbageData = [];
     }
 
     /**

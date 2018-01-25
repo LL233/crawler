@@ -93,7 +93,7 @@ class LinkManager implements LinkManagerInterface
         //如果回收堆中数据的数量已经达到最大值，则执行清除
         //如果最大值为0，则永远不执行清除
         if ($this->garbageClearMax != 0 && $this->garbage->count() >= $this->garbageClearMax) {
-            $this->garbage->clean();
+            $this->garbage->clear();
         }
     }
 }
