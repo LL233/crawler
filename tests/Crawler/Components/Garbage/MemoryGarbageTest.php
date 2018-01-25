@@ -30,7 +30,8 @@ class MemoryGarbageTest extends TestCase
     public function removeRepeatDataProvider()
     {
         return [
-            [['a', 'b'], ['a']]
+            [['a', 'b'], ['a']],
+            [['a', 'b', 'c'], ['a', 'c']]
         ];
     }
 }
