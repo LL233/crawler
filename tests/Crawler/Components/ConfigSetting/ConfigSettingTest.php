@@ -8,10 +8,8 @@ class ConfigSettingTest extends TestCase
 {
     private $config;
 
-    public function __construct()
+    protected function init()
     {
-        parent::__construct();
-
         $this->config = $this->container->make('Config', [
             'config' => [
                 'host' => '127.0.0.1',

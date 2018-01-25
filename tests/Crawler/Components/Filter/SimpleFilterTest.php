@@ -9,10 +9,8 @@ class SimpleFilter extends TestCase
 {
     private $filter;
 
-    public function __construct()
+    protected function init()
     {
-        parent::__construct();
-
         $this->filter = $this->container->make('Filter');
     }
 

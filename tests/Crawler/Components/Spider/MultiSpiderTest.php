@@ -18,10 +18,8 @@ class MultiSpiderTest extends TestCase
      */
     private $multiSpider;
 
-    public function __construct()
+    protected function init()
     {
-        parent::__construct();
-
         $this->multiSpider = $this->container->make('Spider');
     }
 
