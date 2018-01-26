@@ -35,7 +35,7 @@ class HtmlParser implements ParserInterface
      * @param  string $content 待解析的内容
      * @return void
      */
-    public function setContent($content)
+    public function setContent(string $content): void
     {
         $this->document->loadHtml($content);
     }
@@ -44,11 +44,11 @@ class HtmlParser implements ParserInterface
      * 根据规则解析内容，并返回解析后的内容
      *
      * @param  Closure $rule 解析的规则
-     * @return mixed 执行解析后的内容
+     * @return array 执行解析后的内容
      *
      * @throws \Exception
      */
-    public function parseContent($parserFun)
+    public function parseContent($parserFun): array
     {
         if (!$parserFun instanceof Closure) {
             throw new \Exception('HtmlParser parser must be function');

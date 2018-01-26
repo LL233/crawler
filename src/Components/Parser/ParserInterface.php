@@ -17,13 +17,13 @@ interface ParserInterface
      * @param  string $content 待解析的内容
      * @return void
      */
-    public function setContent($content);
+    public function setContent(string $content): void;
 
     /**
      * 根据规则解析内容，并返回解析后的内容
      *
      * @param  mixed $rule 解析的规则
-     * @return mixed 执行解析后的内容
+     * @return array 执行解析后的内容
      */
-    public function parseContent($rule);
+    public function parseContent($rule): array;
 }

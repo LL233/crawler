@@ -22,7 +22,7 @@ class JsonParser implements ParserInterface
      * @param  string $content 待解析的内容
      * @return void
      */
-    public function setContent($content)
+    public function setContent(string $content): void
     {
         $this->content = $content;
     }
@@ -33,7 +33,7 @@ class JsonParser implements ParserInterface
      * @param  bool $assoc 解析的规则
      * @return array
      */
-    public function parseContent($assoc)
+    public function parseContent($assoc): array
     {
         return json_decode($this->content, $assoc);
     }

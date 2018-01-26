@@ -23,7 +23,7 @@ class RegexParser implements ParserInterface
      * @param  string $content 待解析的内容
      * @return void
      */
-    public function setContent($content)
+    public function setContent(string $content): void
     {
         $this->content = $content;
     }
@@ -32,9 +32,9 @@ class RegexParser implements ParserInterface
      * 根据规则解析内容，并返回解析后的内容
      *
      * @param  string $regex 正则表达式
-     * @return mixed 执行解析后的内容
+     * @return array 执行解析后的内容
      */
-    public function parseContent($regex)
+    public function parseContent($regex): array
     {
         $matches = [];
 
