@@ -59,9 +59,9 @@ class Container
     /**
      * 设置并返回全局可用容器实例
      * 
-     * @return static
+     * @return Container
      */
-    public static function getInstance()
+    public static function getInstance(): Container
     {
         if (is_null(static::$instance)) {
             static::$instance = new static;
@@ -80,7 +80,7 @@ class Container
      *
      * @throws Exception
      */
-    public function bind($abstract, Closure $concrete, $isOnly = false)
+    public function bind($abstract, Closure $concrete, bool $isOnly = false): void
     {   
         //如果已经绑定，则抛出异常
         if (isset($this->instances[$abstract])) {
@@ -98,11 +98,11 @@ class Container
      *
      * @param  string $abstract 实例的别名
      * @param  array  $params   执行实例的制造方法时自定义参数
-     * @return mixed 
+     * @return object
      *
      * @throws Exception
      */
-    public function make($abstract, array $params = [])
+    public function make(string $abstract, array $params = []): object
     {
         //如果没有注册别名，则抛出异常
         if (!isset($this->aliases[$abstract])) {
@@ -129,9 +129,9 @@ class Container
      *
      * @param  string $abstract 实例的别名
      * @param  array  $params   执行实例的制造方法时的自定义参数
-     * @return mixed
+     * @return object
      */
-    private function build($abstract, array $params = [])
+    private function build($abstract, array $params = []): object
     {
         $concrete = $this->aliases[$abstract]['concrete'];
 
