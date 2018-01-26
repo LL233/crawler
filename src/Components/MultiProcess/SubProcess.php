@@ -65,7 +65,7 @@ class SubProcess extends BaseProcess
      * @param  int $signal
      * @return void
      */
-    public function signalHandler($signal): void
+    public function signalHandler(int $signal): void
     {
         switch ($signal) {
             //停止

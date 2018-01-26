@@ -103,7 +103,7 @@ class MainProcess extends BaseProcess
      *
      * @return void
      */
-    private function init()
+    private function init(): void
     {
         //检车taskConfig配置是否正确
         $this->checkTaskConfig();
@@ -142,7 +142,7 @@ class MainProcess extends BaseProcess
      *
      * @throws Exception
      */
-    private function daemonize()
+    private function daemonize(): void
     {
         //只有在cli模式下可以变为守护进程
         if (php_sapi_name() != 'cli' || !$this->isDaemonize) {
@@ -183,7 +183,7 @@ class MainProcess extends BaseProcess
      *
      * @return void
      */
-    private function startSubProcess()
+    private function startSubProcess(): void
     {
         foreach ($this->taskConfig as $task) {
             for ($i = 0; $i < $task['count']; $i++) {
@@ -200,7 +200,7 @@ class MainProcess extends BaseProcess
      *
      * @throws Exception
      */
-    private function makeSubProcess(\Closure $handle)
+    private function makeSubProcess(\Closure $handle): void
     {
         $pid = pcntl_fork();
 
@@ -223,7 +223,7 @@ class MainProcess extends BaseProcess
      *
      * @return void
      */
-    private function wait()
+    private function wait(): void
     {
         while (true) {
             $status = 0;
@@ -262,7 +262,7 @@ class MainProcess extends BaseProcess
      * @param  int $signal
      * @return void
      */
-    public function signalHandler($signal)
+    public function signalHandler(int $signal): void
     {
         switch ($signal) {
             //退出
@@ -283,7 +283,7 @@ class MainProcess extends BaseProcess
      *
      * @return void
      */
-    private function stop()
+    private function stop(): void
     {
         $this->stopStatus = 1;
 
@@ -295,7 +295,7 @@ class MainProcess extends BaseProcess
      *
      * @return void
      */
-    private function restart()
+    private function restart(): void
     {
         $this->restartStatus = 1;
 
@@ -307,7 +307,7 @@ class MainProcess extends BaseProcess
      *
      * @return void
      */
-    private function killSubProcess()
+    private function killSubProcess(): void
     {
         $pidMap = array_keys($this->subProcessPidMap);
 
@@ -323,7 +323,7 @@ class MainProcess extends BaseProcess
      * @param  int $pid
      * @return void
      */
-    private function stopHandle($pid)
+    private function stopHandle(int $pid): void
     {
         if (isset($this->subProcessPidMap[$pid])) {
             unset($this->subProcessPidMap[$pid]);
@@ -336,7 +336,7 @@ class MainProcess extends BaseProcess
      * @param  int $pid
      * @return void
      */
-    private function restartHandler($pid)
+    private function restartHandler(int $pid): void
     {
         if (isset($this->subProcessPidMap[$pid])) {
             try {
@@ -363,7 +363,7 @@ class MainProcess extends BaseProcess
      * @param  int $status 子进程的退出状态
      * @return void
      */
-    private function exceptionProcessHandler($pid, $status): void
+    private function exceptionProcessHandler(int $pid, int $status): void
     {
         if (isset($this->subProcessPidMap[$pid])) {
             //如果子进程是完成任务退出，则不重启
@@ -389,7 +389,7 @@ class MainProcess extends BaseProcess
      *
      * @return void
      */
-    private function resetStdout()
+    private function resetStdout(): void
     {
         if (!$this->isDaemonize) {
             return;

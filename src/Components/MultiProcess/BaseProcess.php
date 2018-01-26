@@ -23,7 +23,7 @@ abstract class BaseProcess
      * @param  int $signal
      * @return void
      */
-    abstract function signalHandler($signal): void;
+    abstract function signalHandler(int $signal): void;
 
     /**
      * 注册信号监听
