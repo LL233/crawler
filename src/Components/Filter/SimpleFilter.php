@@ -183,7 +183,7 @@ class SimpleFilter implements FilterInterface
                 //如果已经被标记为无法获取域名，则删除该链接
                 if (!$this->unknowDomain) {
                     //如果拼接域名成功，则保留该链接，否则删除
-                    if (($link = $this->stitchingLink($v)) != false) {
+                    if (!empty($link = $this->stitchingLink($v))) {
                         $isDelete = false;
                         $data[$k] = $link;
                     }
@@ -203,15 +203,15 @@ class SimpleFilter implements FilterInterface
      * 域名为当前链接的域名
      *
      * @param  $link
-     * @return string|bool
+     * @return string
      */
-    private function stitchingLink($link)
+    private function stitchingLink($link): string
     {
         //如果没有当前域名，则去获取
         if (empty($this->currentDomain)) {
-            //如果已经被标记为获取不到，则直接返回false
+            //如果已经被标记为获取不到，则直接返回空
             if ($this->unknowDomain) {
-                return false;
+                return '';
             }
 
             $this->setCurrentDomain();
