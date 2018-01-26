@@ -33,7 +33,7 @@ class ConfigSetting implements ArrayAccess
      * @param  mixed $value  值
      * @return void
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->config[$offset] = $value;
     }
@@ -44,7 +44,7 @@ class ConfigSetting implements ArrayAccess
      * @param  mixed $offset 偏移位置
      * @return void
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->config[$offset]);
     }
@@ -66,7 +66,7 @@ class ConfigSetting implements ArrayAccess
      * @param  mixed $offset 偏移位置
      * @return bool
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->config[$offset]);
     }
