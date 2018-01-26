@@ -60,7 +60,7 @@ class HttpClientParser
      *
      * @return ParserInterface
      */
-    private function resolveData()
+    private function resolveData(): ParserInterface
     {
         $contentType = $this->getContentType();
         $content = $this->getContent($contentType[1] ?? 'charset=utf-8');
@@ -78,7 +78,7 @@ class HttpClientParser
      * @return array
      * @throws Exception
      */
-    private function getContentType()
+    private function getContentType(): array
     {
         //如果没有Content-Type头，则默认为text/html;charset=utf-8
         if (isset($this->response->hasHeader('Content-Type')[0])) {
@@ -103,7 +103,7 @@ class HttpClientParser
      * @param  $charset
      * @return string
      */
-    private function getContent($charset)
+    private function getContent($charset): string
     {
         $content = $this->response->getBody()->getContents();
 
