@@ -23,14 +23,14 @@ abstract class BaseProcess
      * @param  int $signal
      * @return void
      */
-    abstract function signalHandler($signal);
+    abstract function signalHandler($signal): void;
 
     /**
      * 注册信号监听
      *
      * @return void
      */
-    protected function registerSignalHandler()
+    protected function registerSignalHandler(): void
     {
         pcntl_signal(SIGTERM, [$this, "signalHandler"]);
         pcntl_signal(SIGINT, [$this, "signalHandler"]);
@@ -42,7 +42,7 @@ abstract class BaseProcess
      *
      * @return string
      */
-    protected function getSavePidPath()
+    protected function getSavePidPath(): string
     {
         return '/var/run/crawler.pid';
     }
@@ -52,7 +52,7 @@ abstract class BaseProcess
      *
      * @return void
      */
-    protected function savePid()
+    protected function savePid(): void
     {
         $pid = posix_getpid();
 
