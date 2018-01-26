@@ -36,19 +36,8 @@ class Crawler
      * 
      * @return void
      */
-    private function initContainer()
+    private function initContainer(): void
     {
         $this->container = Container::getInstance();
-    }
-
-    /**
-     * 注册基础组件
-     *
-     * @return void
-     */
-    private function registerComponents()
-    {
-        $registerComponents = new RegisterComponents();
-        $registerComponents->registerComponent();
     }
 }
