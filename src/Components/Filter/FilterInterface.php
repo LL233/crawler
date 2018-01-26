@@ -36,16 +36,16 @@ interface FilterInterface
      *
      * @param  string          $tag    当前链接的标识
      * @param  ParserInterface $parser 解析器实例
-     * @return mixed
+     * @return array
      */
-    public function filterLink(string $tag, ParserInterface $parser);
+    public function filterLink(string $tag, ParserInterface $parser): array;
 
     /**
      * 过滤出业务所需数据，提供给用户使用
      *
      * @param  string          $tag    当前链接的标识
      * @param  ParserInterface $parser 解析器实例
-     * @return mixed
+     * @return array
      */
-    public function filterData(string $tag, ParserInterface $parser);
+    public function filterData(string $tag, ParserInterface $parser): array;
 }
