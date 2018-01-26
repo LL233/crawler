@@ -90,7 +90,7 @@ class MultiSpider implements SpiderInterface
      *
      * @throws Exception
      */
-    public function getContent($link): ParserInterface
+    public function getContent(string $link): ParserInterface
     {
         //设置当前链接
         $this->setCurrentLink($link);
@@ -145,7 +145,7 @@ class MultiSpider implements SpiderInterface
     /**
      * 抓取结束
      *
-     * @return mixed
+     * @return void
      */
     public function end(): void
     {
