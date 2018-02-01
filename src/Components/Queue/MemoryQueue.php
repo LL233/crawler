@@ -24,7 +24,9 @@ class MemoryQueue implements QueueInterface
      */
     public function push(array $value): void
     {
-        array_push($this->queue, $value);
+        foreach ($value as $v) {
+            array_push($this->queue, $v);
+        }
     }
 
     /**
@@ -32,9 +34,9 @@ class MemoryQueue implements QueueInterface
      *
      * @return string
      */
-    public function pop(): string
+    public function out(): string
     {
-        return ($popData = array_pop($this->queue)) != null ? $popData : '';
+        return ($popData = array_shift($this->queue)) != null ? $popData : '';
     }
 
     /**
@@ -45,7 +47,7 @@ class MemoryQueue implements QueueInterface
      */
     public function has(string $value): bool
     {
-        return in_array($this->queue, $value);
+        return in_array($value, $this->queue);
     }
 
     /**
@@ -56,6 +58,14 @@ class MemoryQueue implements QueueInterface
     public function isEmpty(): bool
     {
         return empty($this->queue);
+    }
+
+    /**
+     * 清空队列
+     */
+    public function clear(): void
+    {
+        $this->queue = [];
     }
 
     /**

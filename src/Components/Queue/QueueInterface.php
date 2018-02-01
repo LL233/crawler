@@ -22,7 +22,7 @@ interface QueueInterface
      *
      * @return string
      */
-    public function pop(): string;
+    public function out(): string;
 
     /**
      * 判断是否在队列中
@@ -38,6 +38,11 @@ interface QueueInterface
      * @return bool
      */
     public function isEmpty(): bool;
+
+    /**
+     * 清空队列
+     */
+    public function clear(): void;
 
     /**
      * 将数组中与队列中重复的数据删除
