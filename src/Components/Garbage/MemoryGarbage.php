@@ -19,9 +19,9 @@ class MemoryGarbage implements GarbageInterface
     /**
      * 将数据放入垃圾堆中
      *
-     * @param mixed $data
+     * @param array $data
      */
-    public function put($data): void
+    public function put(array $data): void
     {
         if (is_array($data)) {
             $this->garbageData = array_merge($this->garbageData, $data);

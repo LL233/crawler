@@ -15,9 +15,9 @@ interface GarbageInterface
     /**
      * 将数据放入垃圾堆
      *
-     * @param mixed $data
+     * @param array $data
      */
-    public function put($data): void;
+    public function put(array $data): void;
 
     /**
      * 统计垃圾堆中数据的数量
