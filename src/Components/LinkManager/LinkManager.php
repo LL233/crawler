@@ -55,7 +55,7 @@ class LinkManager implements LinkManagerInterface
     public function getLink(): string
     {
         if (!$this->queue->isEmpty()) {
-            $link = $this->queue->pop();
+            $link = $this->queue->out();
 
             //在将链接加入回收堆之前先清理回收堆
             $this->cleanGarbage();
