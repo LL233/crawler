@@ -13,13 +13,37 @@ class MemoryGarbageTest extends TestCase
         $this->garbage = $this->container->make('Garbage');
     }
 
+    public function testPut()
+    {
+        $this->garbage->put(['aaa', 'bbb', 'ccc']);
+
+        $this->assertEquals(3, $this->garbage->count());
+    }
+
+    public function testCount()
+    {
+        $this->garbage->put(['aaa', 'bbb', 'ccc']);
+
+        $this->assertEquals(3, $this->garbage->count());
+
+        $this->garbage->clear();
+
+        $this->assertEquals(0, $this->garbage->count());
+    }
+
+    public function testHas()
+    {
+        $this->garbage->put(['aaa', 'bbb', 'ccc']);
+
+        $this->assertTrue($this->garbage->has('aaa'));
+        $this->assertNotTrue($this->garbage->has('ddd'));
+    }
+
     /**
      * @dataProvider removeRepeatDataProvider
      */
     public function testRemoveRepeat(array $putData, array $repeatData)
     {
-        $this->garbage->clear();
-
         $this->garbage->put($putData);
 
         $resData = $this->garbage->removeRepeat($repeatData);
@@ -33,5 +57,13 @@ class MemoryGarbageTest extends TestCase
             [['a', 'b'], ['a']],
             [['a', 'b', 'c'], ['a', 'c']]
         ];
+    }
+
+    /**
+     * @after
+     */
+    public function clear()
+    {
+        $this->garbage->clear();
     }
 }
