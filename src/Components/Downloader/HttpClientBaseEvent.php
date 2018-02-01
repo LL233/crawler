@@ -40,7 +40,6 @@ class HttpClientBaseEvent
      * @var array
      */
     private $baseEventMap = [
-        "matchTag",
         "setRequestConfig",
         "setCookie",
         "forgeClient"
@@ -71,21 +70,13 @@ class HttpClientBaseEvent
     }
 
     /**
-     * 根据链接匹配tag
-     */
-    private function matchTag(): void
-    {
-        $this->linkTag->match($this->client->requestLink);
-    }
-
-    /**
      * 从配置中获取这次请求的配置
      */
     private function setRequestConfig(): void
     {
         //如果没有设置请求参数，则从配置中获取
         if (empty($this->client->requestParams)) {
-            $this->client->requestParams = $this->config[$this->linkTag->getTag()] ?? [];
+            $this->client->requestParams = $this->config[$this->linkTag->match($this->client->requestLink)] ?? [];
         }
     }
 

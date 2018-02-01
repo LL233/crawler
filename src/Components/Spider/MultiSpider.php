@@ -163,7 +163,7 @@ class MultiSpider implements SpiderInterface
     private function setCurrentLink(string $link): void
     {
         $this->currentLink = $link;
-        $this->tag = $this->linkTag->match($this->currentLink)->getTag();
+        $this->tag = $this->linkTag->match($this->currentLink);
     }
 
     /**
