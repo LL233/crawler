@@ -30,14 +30,14 @@ class LinkTag implements LinkTagInterface
      *
      * @var string
      */
-    private $defaultTag = 'defalut';
+    private $defaultTag = 'default';
 
     /**
-     * 当前的tag
+     * 缓存链接匹配对应的标识
      *
-     * @var string
+     * @var array
      */
-    private $currentTag = '';
+    private $cacheData = [];
 
     /**
      * 设置链接匹配规则
@@ -57,46 +57,31 @@ class LinkTag implements LinkTagInterface
      * @param  string $link
      * @return LinkTagInterface
      */
-    public function match(string $link): LinkTagInterface
+    public function match(string $link): string
     {
-        //如果当前链接没有标识
-        if (empty($this->currentTag)) {
-            //根据规则匹配出标识
-            foreach ($this->ruleGroup as $k => $rule) {
-                if (preg_match($rule, $link)) {
-                    $this->currentTag = $this->tagGroup[$k];
-                }
-            }
+        //如果缓存数据不为空，并且这次匹配的链接与缓存中一致，则直接返回缓存中的标识
+        if (!empty($this->cacheData) && $this->cacheData['link'] == $link) {
+            return $this->cacheData['tag'];
+        } else {
+            $this->cacheData = [];
+        }
 
-            //如果所有规则都没有匹配到，则返回默认的标识
-            if (empty($this->currentTag)) {
-                $this->currentTag = $this->defaultTag;
+        //默认为默认标识名称
+        $currentTag = $this->defaultTag;
+
+        //根据规则匹配出标识
+        foreach ($this->ruleGroup as $k => $rule) {
+            if (preg_match($rule, $link)) {
+                $currentTag = $this->tagGroup[$k];
             }
         }
 
-        return $this;
-    }
+        //将链接对应的标识缓存起来
+        $this->cacheData = [
+            'tag' => $currentTag,
+            'link' => $link
+        ];
 
-    /**
-     * 获取当前标识
-     *
-     * @return string
-     * @throws Exception
-     */
-    public function getTag(): string
-    {
-        if (empty($this->currentTag)) {
-            throw new Exception('do not match before get');
-        }
-
-        return $this->currentTag;
-    }
-
-    /**
-     * 清除标识
-     */
-    public function clean(): void
-    {
-        $this->currentTag = '';
+        return $currentTag;
     }
 }

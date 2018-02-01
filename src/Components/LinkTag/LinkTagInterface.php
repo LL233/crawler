@@ -24,22 +24,7 @@ interface LinkTagInterface
      * 根据当前链接匹配出标识
      *
      * @param  string $link
-     */
-    public function match(string $link): LinkTagInterface;
-
-    /**
-     * 获取根据链接匹配出的标识
-     * 如果没有先执行match方法而直接执行getTag方法
-     * 则抛出一个异常
-     *
      * @return string
-     *
-     * @throws \Exception
      */
-    public function getTag(): string;
-
-    /**
-     * 清除当前的标识
-     */
-    public function clean(): void;
+    public function match(string $link): string;
 }
