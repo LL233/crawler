@@ -43,7 +43,7 @@ class HtmlParser implements ParserInterface
     /**
      * 根据规则解析内容，并返回解析后的内容
      *
-     * @param  Closure $rule 解析的规则
+     * @param  Closure $parserFun 解析的规则
      * @return array 执行解析后的内容
      *
      * @throws \Exception
