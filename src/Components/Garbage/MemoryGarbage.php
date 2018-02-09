@@ -56,7 +56,6 @@ class MemoryGarbage implements GarbageInterface
      */
     public function clear(): void
     {
-        unset($this->garbageData);
         $this->garbageData = [];
     }
 
