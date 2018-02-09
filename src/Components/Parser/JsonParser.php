@@ -30,11 +30,11 @@ class JsonParser implements ParserInterface
     /**
      * 将json字符串解析为数组
      *
-     * @param  bool $assoc 解析的规则
+     * @param  string $assoc 无实际意义，为满足接口要求
      * @return array
      */
-    public function parseContent($assoc): array
+    public function parseContent($assoc = ''): array
     {
-        return json_decode($this->content, $assoc);
+        return json_decode($this->content, true);
     }
 }
