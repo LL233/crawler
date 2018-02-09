@@ -60,7 +60,7 @@ class LinkManager implements LinkManagerInterface
             //在将链接加入回收堆之前先清理回收堆
             $this->cleanGarbage();
             //将取出的链接保存到回收堆
-            $this->garbage->put($link);
+            $this->garbage->put([$link]);
 
             return $link;
         } else {
@@ -75,7 +75,7 @@ class LinkManager implements LinkManagerInterface
      */
     public function saveLink(array $links): void
     {
-        if (!empty($link)) {
+        if (!empty($links)) {
             //将已保存在队列中的链接删除
             $links = $this->queue->removeRepeat($links);
             //将已保存在回收堆中的链接删除
