@@ -8,7 +8,7 @@ class MultiSpiderControllerTest extends TestCase
 {
     public function testStart()
     {
-        $this->container->make('Config', ["config" => ["startLink" => 'https://www.baidu.com']]);
+        $this->container->make('Config')['startLink'] = 'https://www.baidu.com';
 
         $spiderController = $this->container->make("SpiderController");
 
