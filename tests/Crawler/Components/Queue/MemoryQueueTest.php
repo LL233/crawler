@@ -61,6 +61,7 @@ class MemoryQueueTest extends TestCase
     }
 
     /**
+     * @before
      * @after
      */
     public function clear()
