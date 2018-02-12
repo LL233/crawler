@@ -32,6 +32,8 @@ abstract class BaseProcess
      */
     protected function registerSignalHandler(): void
     {
+        pcntl_async_signals(true);
+
         pcntl_signal(SIGTERM, [$this, "signalHandler"]);
         pcntl_signal(SIGINT, [$this, "signalHandler"]);
         pcntl_signal(SIGUSR1, [$this, "signalHandler"]);

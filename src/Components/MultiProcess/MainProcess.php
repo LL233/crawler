@@ -228,8 +228,6 @@ class MainProcess extends BaseProcess
         while (true) {
             $status = 0;
 
-            pcntl_signal_dispatch();
-
             //等待子进程退出
             $pid = pcntl_wait($status, WNOHANG);
 
@@ -268,6 +266,7 @@ class MainProcess extends BaseProcess
             //退出
             case SIGINT :
             case SIGTERM :
+                echo "is stop\n";
                 $this->stop();
                 break;
             //重启
