@@ -70,12 +70,12 @@ class MainProcess extends BaseProcess
      */
     private $stdoutFilePath = '/dev/null';
 	
-	/**
-	 * 进程名称
-	 *
-	 * @var string
-	 */
-	protected $processName = 'crawler main';
+    /**
+     * 进程名称
+     *
+     * @var string
+     */
+    protected $processName = 'crawler main';
 
     /**
      * 主进程构造函数

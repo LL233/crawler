@@ -10,12 +10,12 @@ namespace Crawler\Components\MultiProcess;
  */
 class SubProcess extends BaseProcess
 {
-	/**
-	 * 进程名称
-	 * 
-	 * @var string
-	 */
-	protected $processName = 'crawler worker';
+    /**
+     * 进程名称
+     *
+     * @var string
+     */
+    protected $processName = 'crawler worker';
 
     public function __construct()
     {
