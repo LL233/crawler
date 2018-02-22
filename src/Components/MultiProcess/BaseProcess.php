@@ -16,6 +16,30 @@ abstract class BaseProcess
      * @var int
      */
     const STOP_EXIT = 233;
+	
+	/**
+	 * 进程名字
+	 *
+	 * @var string
+	 */
+	protected $processName = 'none';
+
+	public function __construct()
+	{
+		$this->setProcessName();
+	}
+	
+	/**
+	 * 设置进程名称
+	 *
+	 * @param void
+	 */
+	private function setProcessName(): void
+	{
+		if (function_exists('cli_set_process_title')) {
+			cli_set_process_title($this->processName);
+		}
+	}
 
     /**
      * 信号处理
