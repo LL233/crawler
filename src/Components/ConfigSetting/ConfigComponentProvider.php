@@ -14,7 +14,23 @@ class ConfigComponentProvider extends ComponentProvider
     public function register(): void
     {
         $this->container->bind('Config', function($container, $params){
-            return new \Crawler\Components\ConfigSetting\ConfigSetting($params['config']);
+            $config = new \Crawler\Components\ConfigSetting\ConfigSetting($params['config']);
+
+            //默认的爬虫配置
+            //即使用户设置了一些配置，在这里也将覆盖，保证关键配置的正确性
+            $config['taskConfig'] = [
+                //爬虫任务
+                'spider' => [
+                    'count' => 4,
+                    'handle' => function() use ($container){
+                        $spiderController = $container->make('SpiderController');
+
+                        $spiderController->start();
+                    }
+                ]
+            ];
+
+            return $config;
         });
     }
 }
