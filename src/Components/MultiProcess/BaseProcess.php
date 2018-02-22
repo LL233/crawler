@@ -32,6 +32,7 @@ abstract class BaseProcess
      */
     protected function registerSignalHandler(): void
     {
+		//基于php7.2版本提供的异步信号监听
         pcntl_async_signals(true);
 
         pcntl_signal(SIGTERM, [$this, "signalHandler"]);
