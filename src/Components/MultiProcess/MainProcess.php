@@ -40,7 +40,7 @@ class MainProcess extends BaseProcess
      *
      * @var float
      */
-    private $sleepTime = 0.1;
+    private $sleepTime = 1;
 
     /**
      * 进程是否处于停止状态
@@ -253,10 +253,11 @@ class MainProcess extends BaseProcess
                 if ($this->stopStatus == 0 && $this->restartStatus == 0) {
                     $this->exceptionProcessHandler($pid, $status);
                 }
+                continue;
             }
 
             if (count($this->subProcessPidMap) == 0) {
-                exit(parent::STOP_EXIT);
+                exit(0);
             }
 
             sleep($this->sleepTime);
@@ -275,8 +276,8 @@ class MainProcess extends BaseProcess
             //退出
             case SIGINT :
             case SIGTERM :
-                echo "is stop\n";
                 $this->stop();
+                echo "is stop\n";
                 break;
             //重启
             case SIGUSR1:
@@ -383,10 +384,9 @@ class MainProcess extends BaseProcess
                 }
             }
 
-            //重启一个子进程
+            //如果是其余原因导致的子进程退出，重启一个子进程
             $this->makeSubProcess($this->subProcessPidMap[$pid]);
             unset($this->subProcessPidMap[$pid]);
-
 
             //TODO:记录子进程的退出状态
         }
