@@ -14,7 +14,9 @@ class SpiderControllerComponentProvider extends ComponentProvider
     public function register(): void
     {
         $this->container->bind('SpiderController', function($container){
-            return new MultiProcessSpiderController($container->make('Spider'), $container->make('EventDispatcher'));
+            $config = $container->make("Config");
+
+            return new MultiProcessSpiderController($container->make('Spider'), $container->make('EventDispatcher'), $config['sleepTime']);
         });
     }
 }
