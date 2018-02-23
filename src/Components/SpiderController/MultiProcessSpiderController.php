@@ -2,6 +2,7 @@
 
 namespace Crawler\Components\SpiderController;
 
+use Crawler\Components\ConfigSetting\ConfigSetting;
 use Crawler\Components\Spider\MultiSpider;
 use Crawler\Container\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -28,10 +29,18 @@ class MultiProcessSpiderController implements SpiderControllerInterface
      */
     private $eventDispatcher;
 
-    public function __construct(MultiSpider $spider, EventDispatcher $event)
+    /**
+     * 爬虫的休眠时间
+     *
+     * @var int
+     */
+    private $sleepTime;
+
+    public function __construct(MultiSpider $spider, EventDispatcher $event, int $sleepTime = 1)
     {
         $this->spider = $spider;
         $this->eventDispatcher = $event;
+        $this->sleepTime = $sleepTime;
     }
 
     /**
@@ -57,6 +66,8 @@ class MultiProcessSpiderController implements SpiderControllerInterface
             } else {
                 $this->stop();
             }
+
+            $this->sleepSpider();
         }
     }
 
@@ -81,5 +92,13 @@ class MultiProcessSpiderController implements SpiderControllerInterface
             'spider' => $this->spider,
             'params' => []
         ]));
+    }
+
+    /**
+     * 使爬虫进入休眠时间
+     */
+    private function sleepSpider(): void
+    {
+        sleep($this->sleepTime);
     }
 }
