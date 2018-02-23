@@ -29,6 +29,10 @@ class ConfigComponentProvider extends ComponentProvider
                     }
                 ]
             ];
+            //爬虫的休眠时间
+            if (!isset($config['sleepTime'])) {
+                $config['sleepTime'] = 1;
+            }
 
             return $config;
         });
